@@ -12,12 +12,7 @@ import lombok.Setter;
 public class RenameBookCommand {
 
 	private String bookId;
-	private String externalBookId;
 	
 	private String name;
 
-	public RenameBookCommand(String bookId, String externalBookId) {
-		this.bookId = bookId;
-		this.externalBookId = externalBookId;
-	}
 }

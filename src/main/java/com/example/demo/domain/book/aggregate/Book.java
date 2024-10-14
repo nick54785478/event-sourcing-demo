@@ -147,13 +147,10 @@ public class Book extends BaseEntity {
 		if (StringUtils.isNotBlank(command.getName())) {
 			this.name = command.getName();
 
-			if (this.versions == null) {
-				BookVersion version = new BookVersion(this.uuid, 0);
-				this.versions = new ArrayList<>();
-				this.versions.add(version);
-			}
-			BookVersion version = new BookVersion(this.uuid, this.versions.size() + 1);
-			this.versions.add(version);
+			// 註冊 Domain Event（當有 Next Event 需要發佈時）
+			BaseEvent event = BookStoredEvent.builder().eventLogUuid(UUID.randomUUID().toString()).targetId(this.uuid)
+					.data(new BookStoredEventData(this.uuid)).build();
+			ContextHolder.setEvent(event);
 		}
 	}
 

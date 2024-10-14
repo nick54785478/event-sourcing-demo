@@ -52,11 +52,8 @@ public class BookCommandService extends BaseApplicationService {
 	 */
 	public BookCreatedData create(CreateBookCommand command) {
 		BookCreatedData bookCreatedData = bookService.create(command);
-		// 寫入 EventLog（當有 Next Event 需要發佈時）
-		BaseEvent event = ContextHolder.getEvent();
-		EventLog eventLog = this.generateEventLog(topic, event);
 		// 發布事件
-		this.publishEvent(topic, event, eventLog);
+		this.publishBookEvent();
 		return bookCreatedData;
 	}
 
@@ -78,12 +75,8 @@ public class BookCommandService extends BaseApplicationService {
 	 */
 	public BookUpdatedData update(UpdateBookCommand command) {
 		BookUpdatedData bookUpdatedData = bookService.update(command);
-
-		BaseEvent event = ContextHolder.getEvent();
-		// 寫入 EventLog（當有 Next Event 需要發佈時）
-		EventLog eventLog = this.generateEventLog(topic, event);
 		// 發布事件
-		this.publishEvent(topic, event, eventLog);
+		this.publishBookEvent();
 		return bookUpdatedData;
 	}
 
@@ -117,7 +110,20 @@ public class BookCommandService extends BaseApplicationService {
 	 * @return BookRenamedData
 	 */
 	public BookRenamedData rename(RenameBookCommand command) {
-		return bookService.rename(command);
+		BookRenamedData bookRenameData = bookService.rename(command);
+		this.publishBookEvent();
+		return bookRenameData;
+	}
+	
+	/**
+	 * 發布 Book Event
+	 * */
+	private void publishBookEvent() {
+		BaseEvent event = ContextHolder.getEvent();
+		// 寫入 EventLog（當有 Next Event 需要發佈時）
+		EventLog eventLog = this.generateEventLog(topic, event);
+		// 發布事件
+		this.publishEvent(topic, event, eventLog);
 	}
 
 }

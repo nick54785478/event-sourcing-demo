@@ -57,11 +57,13 @@ public class BookService extends BaseDomainService {
 			Book book = opt.get();
 			book.release(command);
 			Book saved = bookRepository.save(book);
+			
 			try {
 				bookEventStoreService.appendBookEvent(saved);
 			} catch (Throwable e) {
 				log.error("紀錄 EventSourcing 發生錯誤", e);
 			}
+			
 		}
 	}
 
@@ -119,11 +121,6 @@ public class BookService extends BaseDomainService {
 			Book book = opt.get();
 			book.rename(command);
 			Book saved = bookRepository.save(book);
-			try {
-				bookEventStoreService.appendBookEvent(saved);
-			} catch (Throwable e) {
-				log.error("紀錄 EventSourcing 發生錯誤", e);
-			}
 			return new BookRenamedData(saved.getUuid());
 		}
 
