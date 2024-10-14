@@ -1,7 +1,5 @@
 package com.example.demo.domain.book.aggregate;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -10,22 +8,16 @@ import org.apache.commons.lang3.StringUtils;
 import com.example.demo.base.config.context.ContextHolder;
 import com.example.demo.base.entity.BaseEntity;
 import com.example.demo.base.event.BaseEvent;
-import com.example.demo.domain.book.aggregate.vo.BookVersion;
 import com.example.demo.domain.book.command.CreateBookCommand;
-import com.example.demo.domain.book.command.ReleaseBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.ReplayBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.domain.book.outbound.BookStoredEvent;
 import com.example.demo.domain.book.outbound.BookStoredEventData;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -59,9 +51,9 @@ public class Book extends BaseEntity {
 	@Column(name = "ISBN")
 	private String isbn; // isbn
 
-	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY) // 一對多
-	@JoinColumn(name = "BOOK_UUID", updatable = false)
-	private List<BookVersion> versions;
+//	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY) // 一對多
+//	@JoinColumn(name = "BOOK_UUID", updatable = false)
+//	private List<BookVersion> versions;
 
 	/**
 	 * 在持久化之前執行的方法，用於設置 Train UUID。
@@ -83,9 +75,9 @@ public class Book extends BaseEntity {
 		this.author = command.getAuthor();
 		this.isbn = command.getIsbn();
 
-		BookVersion version = new BookVersion(this.u, 0);
-		this.versions = new ArrayList<>();
-		this.versions.add(version);
+//		BookVersion version = new BookVersion(this.u, 0);
+//		this.versions = new ArrayList<>();
+//		this.versions.add(version);
 
 		// 設置CouponNo
 		String couponNo = (command.getCouponNo() != null) ? command.getCouponNo() : null;
@@ -112,15 +104,15 @@ public class Book extends BaseEntity {
 		ContextHolder.setEvent(event);
 	}
 
-	/**
-	 * 紀錄 EventSourcing
-	 * 
-	 * @param command
-	 */
-	public void release(ReleaseBookCommand command) {
-		BookVersion version = new BookVersion(this.uuid, this.versions.size());
-		this.versions.add(version);
-	}
+//	/**
+//	 * 紀錄 EventSourcing
+//	 * 
+//	 * @param command
+//	 */
+//	public void release(ReleaseBookCommand command) {
+//		BookVersion version = new BookVersion(this.uuid, this.versions.size());
+//		this.versions.add(version);
+//	}
 
 	/**
 	 * replay EventSourcing
@@ -133,7 +125,7 @@ public class Book extends BaseEntity {
 		this.name = command.getName();
 		this.author = command.getAuthor();
 		this.isbn = command.getIsbn();
-		this.versions = command.getVersions();
+//		this.versions = command.getVersions();
 		this.setCreatedDate(command.getCreatedDate());
 		this.setCreatedBy(command.getCreatedBy());
 	}

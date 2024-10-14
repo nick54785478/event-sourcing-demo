@@ -31,7 +31,7 @@ class BookEventStoreServiceTest {
 	@Test
 	void testAppendBookEvent() throws Throwable {
 		String uuid = UUID.randomUUID().toString();
-		Book book = new Book(uuid, uuid, "水滸傳", "施耐庵", "9789869442060",  new ArrayList<>());
+		Book book = new Book(uuid, uuid, "水滸傳", "施耐庵", "9789869442060");
 		bookEventStoreService.appendBookEvent(book);
 	}
 	

@@ -55,11 +55,8 @@ public class BookService extends BaseDomainService {
 			log.error(String.format("book not found (%s)", command.getBookId()));
 		} else {
 			Book book = opt.get();
-			book.release(command);
-			Book saved = bookRepository.save(book);
-			
 			try {
-				bookEventStoreService.appendBookEvent(saved);
+				bookEventStoreService.appendBookEvent(book);
 			} catch (Throwable e) {
 				log.error("紀錄 EventSourcing 發生錯誤", e);
 			}

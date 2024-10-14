@@ -17,6 +17,4 @@ public class BookQueriedData {
 
 	private String isbn; // isbn
 
-	private Integer version; // 最新版本
-
 }
