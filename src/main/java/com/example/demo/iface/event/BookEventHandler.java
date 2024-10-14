@@ -14,7 +14,6 @@ import com.example.demo.base.service.BaseEventHandler;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
 import com.example.demo.domain.book.outbound.BookStoredEvent;
 import com.example.demo.domain.book.outbound.BookStoredEventData;
-import com.example.demo.infra.event.BookEventStoreService;
 import com.example.demo.service.BookCommandService;
 import com.example.demo.util.BaseDataTransformer;
 import com.example.demo.util.ClassParseUtil;
@@ -27,8 +26,6 @@ public class BookEventHandler extends BaseEventHandler {
 
 	@Autowired
 	private BookCommandService bookCommandService;
-	@Autowired
-	private BookEventStoreService bookEventStoreService;
 
 	/**
 	 * 接收 Event

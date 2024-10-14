@@ -26,5 +26,16 @@ public class KafkaService {
 		kafkaTemplate.send(topic, ClassParseUtil.serialize(event));
 		log.debug("發布事件，message: {}", event);
 	}
+	
+	/**
+	 * 發布 Event
+	 * 
+	 * @param topic Topic
+	 * @param eventBody Event
+	 */
+	public void publish(String topic, String eventBody) {
+		kafkaTemplate.send(topic, eventBody);
+		log.debug("發布事件，message: {}", eventBody);
+	}
 
 }

@@ -74,8 +74,8 @@ public class BookCommandService extends BaseApplicationService {
 	 * @return BookUpdatedData
 	 */
 	public BookUpdatedData update(UpdateBookCommand command) {
-		BookUpdatedData bookUpdatedData = bookService.update(command);
 		// 發布事件
+		BookUpdatedData bookUpdatedData = bookService.update(command);
 		this.publishBookEvent();
 		return bookUpdatedData;
 	}
@@ -114,10 +114,10 @@ public class BookCommandService extends BaseApplicationService {
 		this.publishBookEvent();
 		return bookRenameData;
 	}
-	
+
 	/**
 	 * 發布 Book Event
-	 * */
+	 */
 	private void publishBookEvent() {
 		BaseEvent event = ContextHolder.getEvent();
 		// 寫入 EventLog（當有 Next Event 需要發佈時）
