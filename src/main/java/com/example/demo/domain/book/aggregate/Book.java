@@ -50,10 +50,9 @@ public class Book extends BaseEntity {
 
 	@Column(name = "ISBN")
 	private String isbn; // isbn
-
-//	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.LAZY) // 一對多
-//	@JoinColumn(name = "BOOK_UUID", updatable = false)
-//	private List<BookVersion> versions;
+	
+	@Column(name = "VERSION")
+	private Integer version = 0;
 
 	/**
 	 * 在持久化之前執行的方法，用於設置 Train UUID。
@@ -70,14 +69,10 @@ public class Book extends BaseEntity {
 	 */
 	public void create(CreateBookCommand command) {
 		this.u = UUID.randomUUID().toString();
-
 		this.name = command.getName();
 		this.author = command.getAuthor();
 		this.isbn = command.getIsbn();
-
-//		BookVersion version = new BookVersion(this.u, 0);
-//		this.versions = new ArrayList<>();
-//		this.versions.add(version);
+		this.version += 1;
 
 		// 設置CouponNo
 		String couponNo = (command.getCouponNo() != null) ? command.getCouponNo() : null;
@@ -98,21 +93,14 @@ public class Book extends BaseEntity {
 		this.name = command.getName();
 		this.author = command.getAuthor();
 		this.isbn = command.getIsbn();
+		this.version += 1;
+
 		// 註冊 Domain Event（當有 Next Event 需要發佈時）
 		BaseEvent event = BookStoredEvent.builder().eventLogUuid(UUID.randomUUID().toString()).targetId(this.uuid)
 				.data(new BookStoredEventData(this.uuid)).build();
 		ContextHolder.setEvent(event);
 	}
 
-//	/**
-//	 * 紀錄 EventSourcing
-//	 * 
-//	 * @param command
-//	 */
-//	public void release(ReleaseBookCommand command) {
-//		BookVersion version = new BookVersion(this.uuid, this.versions.size());
-//		this.versions.add(version);
-//	}
 
 	/**
 	 * replay EventSourcing
@@ -125,7 +113,7 @@ public class Book extends BaseEntity {
 		this.name = command.getName();
 		this.author = command.getAuthor();
 		this.isbn = command.getIsbn();
-//		this.versions = command.getVersions();
+		this.version = command.getVersion();
 		this.setCreatedDate(command.getCreatedDate());
 		this.setCreatedBy(command.getCreatedBy());
 	}
@@ -138,6 +126,7 @@ public class Book extends BaseEntity {
 	public void rename(RenameBookCommand command) {
 		if (StringUtils.isNotBlank(command.getName())) {
 			this.name = command.getName();
+			this.version += 1;
 
 			// 註冊 Domain Event（當有 Next Event 需要發佈時）
 			BaseEvent event = BookStoredEvent.builder().eventLogUuid(UUID.randomUUID().toString()).targetId(this.uuid)

@@ -48,5 +48,5 @@ public class EventRePublishSchedule {
 			eventLogRepository.saveAll(eventLogList);
 		}
 	}
-	
+
 }

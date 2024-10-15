@@ -15,6 +15,7 @@ public class ReplayBookCommand {
 	private String name;
 	private String author;
 	private String isbn;
+	private Integer version;
 	private Date createdDate; // 創建時間
 	private String createdBy; // 創建者
 	private Date lastUpdatedDate; // 最後異動時間

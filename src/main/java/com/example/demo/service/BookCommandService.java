@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -87,12 +89,29 @@ public class BookCommandService extends BaseApplicationService {
 	 */
 	public void replay(String bookId) {
 		try {
-			String entity = new Book().getClass().getSimpleName();
-			List<ResolvedEvent> events = bookEventStoreService.readEvents(entity + "-" + bookId);
+			List<ResolvedEvent> events = new ArrayList<>();
+
+			String streamId = new Book().getClass().getSimpleName() + "-" + bookId;
+
+			// 嘗試讀取 Snapshot
+			ResolvedEvent resolvedEvent = bookEventStoreService.readSnapshot(streamId);
+			if (!Objects.isNull(resolvedEvent)) {
+				log.debug("取得 Snapshot");
+				// 取得 Snapshot
+				byte[] eventData = resolvedEvent.getEvent().getEventData();
+				Book book = ClassParseUtil.unserialize(eventData, Book.class);
+				// 版本-1為該資料的 index (若 Version=10，則為第十筆(index = 9))
+				events = bookEventStoreService.readEvents(streamId, book.getVersion() - 1);
+			} else {
+				log.debug("未取到 Snapshot，從頭開始 replay");
+				// 若未取到，從頭開始 replay
+				events = bookEventStoreService.readEvents(streamId);
+			}
+			log.info("events:{}", events);
 
 			// 防腐處理
-			List<ReplayBookCommand> commandList = events.stream().map(resolvedEvent -> {
-				byte[] eventData = resolvedEvent.getEvent().getEventData();
+			List<ReplayBookCommand> commandList = events.stream().map(e -> {
+				byte[] eventData = e.getEvent().getEventData();
 				return ClassParseUtil.unserialize(eventData, ReplayBookCommand.class);
 			}).collect(Collectors.toList());
 

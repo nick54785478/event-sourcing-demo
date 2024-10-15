@@ -17,8 +17,11 @@ import com.example.demo.domain.share.BookCreatedData;
 import com.example.demo.domain.share.BookQueriedData;
 import com.example.demo.domain.share.BookRenamedData;
 import com.example.demo.domain.share.BookUpdatedData;
+import com.example.demo.domain.snapshot.Snapshot;
 import com.example.demo.infra.event.BookEventStoreService;
 import com.example.demo.infra.repository.BookRepository;
+import com.example.demo.infra.repository.SnapshotRepository;
+import com.example.demo.util.ClassParseUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BookService extends BaseDomainService {
 
 	private BookRepository bookRepository;
+	private SnapshotRepository snapshotRepository;
 	private BookEventStoreService bookEventStoreService;
 
 	/**
@@ -46,7 +50,9 @@ public class BookService extends BaseDomainService {
 	}
 
 	/**
-	 * 更新版本號
+	 * 更新版本號並儲存版本資訊
+	 * 
+	 * @param command
 	 */
 	public void release(ReleaseBookCommand command) {
 		// 取得本次交易 Aggregate
@@ -55,12 +61,25 @@ public class BookService extends BaseDomainService {
 			log.error(String.format("book not found (%s)", command.getBookId()));
 		} else {
 			Book book = opt.get();
+			String classType = book.getClass().getName();
+			Snapshot snapshot = Snapshot.builder().aggregateId(book.getUuid()).classType(classType)
+					.state(ClassParseUtil.serialize(book)).version(book.getVersion()).build();
+			snapshotRepository.save(snapshot);
 			try {
 				bookEventStoreService.appendBookEvent(book);
 			} catch (Throwable e) {
 				log.error("紀錄 EventSourcing 發生錯誤", e);
 			}
-			
+
+			// TODO 版本號每 10 進行快照存取，後面自定義
+			if (book.getVersion() % 10 == 0) {
+				try {
+					bookEventStoreService.createSnapshot(snapshot);
+				} catch (Throwable e) {
+					log.error("存取快照失敗", e);
+				}
+			}
+
 		}
 	}
 
@@ -132,6 +151,7 @@ public class BookService extends BaseDomainService {
 		commands.stream().forEach(command -> {
 			Book book = new Book();
 			book.replay(command);
+			log.info("Book version:{}, book:{}, ", book.getVersion(), book);
 			bookRepository.save(book);
 		});
 	}

@@ -14,9 +14,9 @@ import com.example.demo.base.event.BaseEvent;
 
 /**
  * 與 EventSource DB 交互
- * */
+ */
 @Service
-public class EventStoreService {
+public abstract class EventStoreService {
 
 	@Autowired
 	protected EventStoreDBClient eventStoreDBClient;
@@ -37,13 +37,27 @@ public class EventStoreService {
 	/**
 	 * 從指定事件流中讀取事件
 	 * 
-	 * @param streamName
+	 * @param streamId
 	 * @return List<ResolvedEvent> 事件列表
 	 */
-	public List<ResolvedEvent> readEvents(String streamName) throws Throwable {
+	public List<ResolvedEvent> readEvents(String streamId) throws Throwable {
 		// 從指定的事件流中讀取事件
 		ReadStreamOptions options = ReadStreamOptions.get().forwards().fromStart();
+		return eventStoreDBClient.readStream(streamId, options).get().getEvents();
+	}
 
-		return eventStoreDBClient.readStream(streamName, options).get().getEvents();
+	/**
+	 * 從指定版本事件流中往後讀取事件
+	 * 
+	 * @param streamId 通常為 Prefix(Entity 名) + Aggregate 的唯一鍵值
+	 * @param index  版本，為 version - 1
+	 * @return List<ResolvedEvent> 事件列表
+	 */
+	public List<ResolvedEvent> readEvents(String streamId, Integer index) throws Throwable {
+		// 從指定的事件流中讀取事件
+		ReadStreamOptions options = ReadStreamOptions.get().forwards().fromStart();
+		// 獲取快照版本之後的所有事件
+		return eventStoreDBClient.readStream(streamId, options.fromRevision(index)).get().getEvents();
+
 	}
 }
