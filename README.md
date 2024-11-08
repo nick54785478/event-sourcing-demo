@@ -8,7 +8,7 @@
 >* SpringBoot 3.3.4
 >* JDK 17
 >* MySQL
->* Kafka & ZooLeeper 
+>* Kafka & ZooKeeper 
 >* Event Source DB
 
 <h3>啟動步驟</h3>
