@@ -7,13 +7,11 @@ import java.util.Map;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAdapter;
 
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.iface.dto.CreateBookResource;
-import com.example.demo.iface.rest.BookController;
 import com.example.demo.util.BaseDataTransformer;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Book Controller Request Adapter 示範
  * 目前是採用 BaseDataTransformer 直接轉
+ * 暫不使用
  */
 @Slf4j
+// 註解掉 目前暫不使用
 //@RestControllerAdvice(assignableTypes = { BookController.class })
 public class BookRequestBodyAdapter extends RequestBodyAdviceAdapter {
 
