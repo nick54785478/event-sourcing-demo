@@ -20,9 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Book Controller Request Adapter 示範
+ * 目前是採用 BaseDataTransformer 直接轉
  */
 @Slf4j
-@RestControllerAdvice(assignableTypes = { BookController.class })
+//@RestControllerAdvice(assignableTypes = { BookController.class })
 public class BookRequestBodyAdapter extends RequestBodyAdviceAdapter {
 
 	/**
