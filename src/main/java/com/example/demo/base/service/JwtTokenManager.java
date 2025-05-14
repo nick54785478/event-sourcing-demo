@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtTokenService {
+public class JwtTokenManager {
 
 	@Value("${jwt.secret.key}")
 	private String scretKey;
