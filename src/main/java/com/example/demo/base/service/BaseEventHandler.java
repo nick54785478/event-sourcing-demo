@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.event.BaseEvent;
-import com.example.demo.base.infra.EventIdempotentHandler;
+import com.example.demo.base.infra.event.EventIdempotentHandler;
 import com.example.demo.base.infra.repository.EventLogRepository;
 import com.example.demo.base.infra.repository.EventSourceRepository;
 import com.example.demo.base.util.BaseDataTransformer;

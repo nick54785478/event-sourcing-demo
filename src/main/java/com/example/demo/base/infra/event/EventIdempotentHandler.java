@@ -1,4 +1,4 @@
-package com.example.demo.base.infra;
+package com.example.demo.base.infra.event;
 
 import java.util.List;
 

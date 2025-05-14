@@ -9,6 +9,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.example.demo.base.config.security.JwtConstants;
 
@@ -23,9 +24,9 @@ import lombok.extern.slf4j.Slf4j;
  * 用於執行 Jwt 相關操作的 Service
  */
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
-public class JwtTokenManager {
+public class JwtTokenService {
 
 	@Value("${jwt.secret.key}")
 	private String scretKey;

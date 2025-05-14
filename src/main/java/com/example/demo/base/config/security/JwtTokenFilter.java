@@ -9,7 +9,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.demo.base.config.context.ContextHolder;
-import com.example.demo.base.service.JwtTokenManager;
+import com.example.demo.base.service.JwtTokenService;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
 	@Autowired
-	private JwtTokenManager jwtTokenManager;
+	private JwtTokenService jwtTokenService;
 
 	@Value("${jwt.auth.enabled}")
 	private boolean jwtAuthEnabled;
@@ -62,7 +62,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		if (!jwtAuthEnabled) {
 			// 測試用: 10 年的 Token
 			String token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJEQVRBX09XTkVSIl0sImlzcyI6IlNZU1RFTSIsInN1YiI6Im5pY2sxMjNAZXhhbXBsZS5jb20iLCJpYXQiOjE3MjYxMzcyNDQsImV4cCI6MjA0MTQ5NzI0NH0.kxzrgtEifDx7u-IFAl9lHQshyjUYOaHkRfCi7ZWFooY";
-			Claims tokenBody = jwtTokenManager.getTokenBody(token);
+			Claims tokenBody = jwtTokenService.getTokenBody(token);
 			ContextHolder.setJwtClaims(tokenBody);
 			ContextHolder.setJwtToken(token);
 			chain.doFilter(request, response);
@@ -123,13 +123,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 	 */
 	private boolean validateJwtToken(String token, HttpServletResponse response) throws IOException {
 		// 解析 JWT Token
-		Claims claims = jwtTokenManager.getTokenBody(token);
+		Claims claims = jwtTokenService.getTokenBody(token);
 
 		log.debug("JWT claims: {}", claims);
 
 		if (jwtAuthEnabled) {
 			// 驗證 JWT Token
-			jwtTokenManager.parseToken(token);
+			jwtTokenService.parseToken(token);
 		}
 
 		// 驗證通過將 JWT Token 存儲到 ContextHolder 中
