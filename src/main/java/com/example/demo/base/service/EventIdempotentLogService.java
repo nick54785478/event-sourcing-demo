@@ -20,7 +20,7 @@ import com.example.demo.base.repository.EventIdempotentLogRepository;
 public class EventIdempotentLogService {
 
 	@Autowired
-	EventIdempotentLogRepository repository;
+	private EventIdempotentLogRepository repository;
 
 	/**
 	 * 執行 Event 的冪等機制

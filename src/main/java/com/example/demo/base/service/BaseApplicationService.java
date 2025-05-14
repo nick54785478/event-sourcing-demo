@@ -10,7 +10,7 @@ import com.example.demo.base.event.BaseEvent;
 import com.example.demo.base.repository.EventLogRepository;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.base.util.ClassParseUtil;
-import com.example.demo.infra.event.KafkaService;
+import com.example.demo.infra.event.KafkaEventPublisher;
 
 /**
  * Base Application Service
@@ -19,7 +19,7 @@ import com.example.demo.infra.event.KafkaService;
 public abstract class BaseApplicationService {
 
 	@Autowired
-	protected KafkaService kafkaService;
+	protected KafkaEventPublisher kafkaEventPublisher;
 	@Autowired
 	protected EventLogRepository eventLogRepository;
 
@@ -55,7 +55,7 @@ public abstract class BaseApplicationService {
 	 * @param eventLog
 	 */
 	public void publishEvent(String topic, BaseEvent event, EventLog eventLog) {
-		kafkaService.publish(topic, event);
+		kafkaEventPublisher.publish(topic, event);
 		String body = ClassParseUtil.serialize(event);
 		eventLog.publish(body);
 		eventLogRepository.save(eventLog);

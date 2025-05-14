@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.enums.EventLogSendQueueStatus;
 import com.example.demo.base.repository.EventLogRepository;
-import com.example.demo.infra.event.KafkaService;
+import com.example.demo.infra.event.KafkaEventPublisher;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +22,7 @@ public class EventRePublishSchedule {
 	@Autowired
 	private EventLogRepository eventLogRepository;
 	@Autowired
-	private KafkaService kafkaService;
+	private KafkaEventPublisher kafkaEventPublisher;
 
 	@Value("${kafka.book.topic.name}")
 	private String topic;
@@ -42,7 +42,7 @@ public class EventRePublishSchedule {
 				log.debug("Event Data: {}", eventLog.getBody());
 
 				// Event 重發佈
-				kafkaService.publish(topic, eventLog.getBody());
+				kafkaEventPublisher.publish(topic, eventLog.getBody());
 				eventLog.publish(eventLog.getBody()); // 變更狀態為: 已發布
 			});
 			eventLogRepository.saveAll(eventLogList);

@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class KafkaService {
+public class KafkaEventPublisher {
 
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
