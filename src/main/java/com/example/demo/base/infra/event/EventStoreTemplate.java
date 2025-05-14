@@ -1,9 +1,10 @@
-package com.example.demo.base.service;
+package com.example.demo.base.infra.event;
 
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.eventstore.dbclient.EventData;
@@ -15,8 +16,8 @@ import com.example.demo.base.event.BaseEvent;
 /**
  * 與 EventSource DB 交互
  */
-@Service
-public abstract class EventStoreService {
+@Component
+public abstract class EventStoreTemplate {
 
 	@Autowired
 	protected EventStoreDBClient eventStoreDBClient;

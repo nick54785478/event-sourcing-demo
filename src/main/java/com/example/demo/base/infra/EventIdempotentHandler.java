@@ -1,23 +1,23 @@
-package com.example.demo.base.service;
+package com.example.demo.base.infra;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.base.entity.EventIdempotentLog;
 import com.example.demo.base.event.BaseEvent;
-import com.example.demo.base.repository.EventIdempotentLogRepository;
+import com.example.demo.base.infra.repository.EventIdempotentLogRepository;
 
 /**
  * Event Idempotent Service 用於執行冪等機制的 Service，防止重複消費的副作用
  */
-@Service
+@Component
 @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, timeout = 3600, rollbackFor = Exception.class)
-public class EventIdempotentLogService {
+public class EventIdempotentHandler {
 
 	@Autowired
 	private EventIdempotentLogRepository repository;

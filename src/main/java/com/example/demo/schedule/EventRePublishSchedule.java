@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.enums.EventLogSendQueueStatus;
-import com.example.demo.base.repository.EventLogRepository;
+import com.example.demo.base.infra.repository.EventLogRepository;
 import com.example.demo.infra.event.KafkaEventPublisher;
 
 import lombok.extern.slf4j.Slf4j;

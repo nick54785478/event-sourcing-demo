@@ -19,7 +19,7 @@ import com.example.demo.domain.share.BookQueriedData;
 import com.example.demo.domain.share.BookRenamedData;
 import com.example.demo.domain.share.BookUpdatedData;
 import com.example.demo.domain.snapshot.Snapshot;
-import com.example.demo.infra.event.BookEventStoreService;
+import com.example.demo.infra.event.BookEventStorer;
 import com.example.demo.infra.repository.BookRepository;
 import com.example.demo.infra.repository.SnapshotRepository;
 
@@ -33,7 +33,7 @@ public class BookService extends BaseDomainService {
 
 	private BookRepository bookRepository;
 	private SnapshotRepository snapshotRepository;
-	private BookEventStoreService bookEventStoreService;
+	private BookEventStorer bookEventStoreService;
 
 	/**
 	 * 新增書籍資料

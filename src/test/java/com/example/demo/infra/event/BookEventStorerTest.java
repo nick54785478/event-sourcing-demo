@@ -14,10 +14,10 @@ import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.snapshot.Snapshot;
 
 @SpringBootTest
-class BookEventStoreServiceTest {
+class BookEventStorerTest {
 
 	@Autowired
-	private BookEventStoreService bookEventStoreService;
+	private BookEventStorer bookEventStoreService;
 
 //	@Test
 	void test() throws Throwable {

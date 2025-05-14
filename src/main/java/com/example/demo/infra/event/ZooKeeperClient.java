@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  * */
 @Slf4j
 @Service
-public class ZooKeeperService {
+public class ZooKeeperClient {
 
 	@Autowired
 	private ZooKeeper zkClient;

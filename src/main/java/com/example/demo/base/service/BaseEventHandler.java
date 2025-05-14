@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.event.BaseEvent;
-import com.example.demo.base.repository.EventLogRepository;
-import com.example.demo.base.repository.EventSourceRepository;
+import com.example.demo.base.infra.EventIdempotentHandler;
+import com.example.demo.base.infra.repository.EventLogRepository;
+import com.example.demo.base.infra.repository.EventSourceRepository;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.base.util.ClassParseUtil;
 
@@ -24,7 +25,7 @@ public class BaseEventHandler {
 	@Autowired
 	protected EventSourceRepository eventSourceRepository;
 	@Autowired
-	protected EventIdempotentLogService eventIdempotentLogService;
+	protected EventIdempotentHandler eventIdempotentHandler;
 
 	/**
 	 * 檢查冪等
@@ -33,7 +34,7 @@ public class BaseEventHandler {
 	 * @return boolean
 	 */
 	public boolean checkEventIdempotency(BaseEvent event) {
-		return eventIdempotentLogService.handleIdempotency(event);
+		return eventIdempotentHandler.handleIdempotency(event);
 	}
 
 	/**

@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class DistributedService extends ZooKeeperService {
+public class DistributedService extends ZooKeeperClient {
 
 	private static final String LOCK_ROOT_PATH = "/locks";
 	private static final String LOCK_NODE_NAME = "lock_";

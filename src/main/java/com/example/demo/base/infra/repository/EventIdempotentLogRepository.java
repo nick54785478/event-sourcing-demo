@@ -1,4 +1,4 @@
-package com.example.demo.base.repository;
+package com.example.demo.base.infra.repository;
 
 import java.util.List;
 
