@@ -17,6 +17,7 @@ import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.event.BaseEvent;
 import com.example.demo.base.exception.ValidationException;
 import com.example.demo.base.service.BaseApplicationService;
+import com.example.demo.base.util.ClassParseUtil;
 import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
@@ -28,7 +29,6 @@ import com.example.demo.domain.share.BookCreatedData;
 import com.example.demo.domain.share.BookRenamedData;
 import com.example.demo.domain.share.BookUpdatedData;
 import com.example.demo.infra.event.BookEventStoreService;
-import com.example.demo.util.ClassParseUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

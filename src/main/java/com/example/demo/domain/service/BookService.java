@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.base.exception.ValidationException;
 import com.example.demo.base.service.BaseDomainService;
+import com.example.demo.base.util.ClassParseUtil;
 import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
@@ -21,7 +22,6 @@ import com.example.demo.domain.snapshot.Snapshot;
 import com.example.demo.infra.event.BookEventStoreService;
 import com.example.demo.infra.repository.BookRepository;
 import com.example.demo.infra.repository.SnapshotRepository;
-import com.example.demo.util.ClassParseUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

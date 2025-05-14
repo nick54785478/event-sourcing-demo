@@ -14,9 +14,9 @@ import com.eventstore.dbclient.ReadStreamOptions;
 import com.eventstore.dbclient.ResolvedEvent;
 import com.eventstore.dbclient.StreamNotFoundException;
 import com.example.demo.base.service.EventStoreService;
+import com.example.demo.base.util.ClassParseUtil;
 import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.snapshot.Snapshot;
-import com.example.demo.util.ClassParseUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

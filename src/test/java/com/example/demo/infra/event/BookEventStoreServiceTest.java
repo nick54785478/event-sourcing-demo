@@ -9,9 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.eventstore.dbclient.ResolvedEvent;
 import com.example.demo.base.event.BaseEvent;
+import com.example.demo.base.util.ClassParseUtil;
 import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.snapshot.Snapshot;
-import com.example.demo.util.ClassParseUtil;
 
 @SpringBootTest
 class BookEventStoreServiceTest {

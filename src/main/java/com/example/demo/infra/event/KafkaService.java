@@ -5,7 +5,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.base.event.BaseEvent;
-import com.example.demo.util.ClassParseUtil;
+import com.example.demo.base.util.ClassParseUtil;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-package com.example.demo.util;
+package com.example.demo.base.util;
 
 import java.io.IOException;
 import java.util.List;
