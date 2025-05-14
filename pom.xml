@@ -30,6 +30,7 @@
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.3</spring-cloud.version>
 		<jjwt.version>0.12.6</jjwt.version>
+		<springdoc-openapi.version>2.3.0</springdoc-openapi.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -81,6 +82,11 @@
 		    <groupId>org.apache.zookeeper</groupId>
 		    <artifactId>zookeeper</artifactId>
 		    <version>3.5.10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc-openapi.version}</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.springframework.cloud</groupId>

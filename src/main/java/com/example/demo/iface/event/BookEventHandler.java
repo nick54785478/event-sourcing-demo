@@ -11,11 +11,11 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.base.service.BaseEventHandler;
+import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
 import com.example.demo.domain.book.outbound.BookStoredEvent;
 import com.example.demo.domain.book.outbound.BookStoredEventData;
 import com.example.demo.service.BookCommandService;
-import com.example.demo.util.BaseDataTransformer;
 import com.example.demo.util.ClassParseUtil;
 
 import lombok.extern.slf4j.Slf4j;

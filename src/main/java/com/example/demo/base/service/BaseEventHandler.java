@@ -10,8 +10,7 @@ import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.event.BaseEvent;
 import com.example.demo.base.repository.EventLogRepository;
 import com.example.demo.base.repository.EventSourceRepository;
-import com.example.demo.infra.event.KafkaService;
-import com.example.demo.util.BaseDataTransformer;
+import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.util.ClassParseUtil;
 
 /**
@@ -19,15 +18,13 @@ import com.example.demo.util.ClassParseUtil;
  */
 @Component
 public class BaseEventHandler {
-	
-	@Autowired
-	protected EventIdempotentLogService eventIdempotentLogService;
-	@Autowired
-	protected KafkaService kafkaService;
+
 	@Autowired
 	protected EventLogRepository eventLogRepository;
 	@Autowired
 	protected EventSourceRepository eventSourceRepository;
+	@Autowired
+	protected EventIdempotentLogService eventIdempotentLogService;
 
 	/**
 	 * 檢查冪等
@@ -61,17 +58,6 @@ public class BaseEventHandler {
 	 */
 	public <S, T> List<T> transformData(List<S> target, Class<T> clazz) {
 		return BaseDataTransformer.transformData(target, clazz);
-	}
-
-	/**
-	 * 發布事件 (Event)
-	 * 
-	 * @param topic Topic
-	 * @param event 事件
-	 */
-	public void publishEvent(String topic, BaseEvent event) {
-		kafkaService.publish(topic, event);
-		// 建立 EventLog
 	}
 
 	/**

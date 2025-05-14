@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
@@ -26,7 +27,6 @@ import com.example.demo.iface.dto.RenameBookResource;
 import com.example.demo.iface.dto.UpdateBookResource;
 import com.example.demo.service.BookCommandService;
 import com.example.demo.service.BookQueryService;
-import com.example.demo.util.BaseDataTransformer;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
