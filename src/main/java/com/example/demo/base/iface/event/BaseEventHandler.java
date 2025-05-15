@@ -14,8 +14,6 @@ import com.example.demo.base.infra.repository.EventSourceRepository;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.base.util.ClassParseUtil;
 
-import lombok.AllArgsConstructor;
-
 /**
  * Base Event Handler
  */

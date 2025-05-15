@@ -1,4 +1,4 @@
-package com.example.demo.schedule;
+package com.example.demo.iface.schedule;
 
 import java.util.Date;
 import java.util.List;

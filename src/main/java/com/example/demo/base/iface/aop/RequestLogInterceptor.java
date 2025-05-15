@@ -17,9 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 用於日誌紀錄與性能監控的攔截器
  */
+@Slf4j
 @Aspect
 @Component
-@Slf4j
 public class RequestLogInterceptor {
 
 	/**

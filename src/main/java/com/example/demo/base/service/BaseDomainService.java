@@ -19,9 +19,9 @@ import com.example.demo.base.util.ClassParseUtil;
 public abstract class BaseDomainService {
 
 	@Autowired
-	protected EventSourceRepository eventSourceRepository;
-	@Autowired
 	protected EventLogRepository eventLogRepository;
+	@Autowired
+	protected EventSourceRepository eventSourceRepository;
 
 	/**
 	 * 呼叫 BaseDataTransformer 進行資料轉換
