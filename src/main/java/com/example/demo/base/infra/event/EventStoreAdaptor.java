@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import com.eventstore.dbclient.EventData;
 import com.eventstore.dbclient.EventStoreDBClient;
@@ -17,7 +16,7 @@ import com.example.demo.base.event.BaseEvent;
  * 與 EventSource DB 交互
  */
 @Component
-public abstract class EventStoreTemplate {
+public abstract class EventStoreAdaptor {
 
 	@Autowired
 	protected EventStoreDBClient eventStoreDBClient;

@@ -10,7 +10,7 @@ import com.example.demo.base.event.BaseEvent;
 import com.example.demo.base.infra.repository.EventLogRepository;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.base.util.ClassParseUtil;
-import com.example.demo.infra.event.KafkaEventPublisher;
+import com.example.demo.infra.event.KafkaPublishAdapter;
 
 /**
  * Base Application Service
@@ -19,7 +19,7 @@ import com.example.demo.infra.event.KafkaEventPublisher;
 public abstract class BaseApplicationService {
 
 	@Autowired
-	protected KafkaEventPublisher kafkaEventPublisher;
+	protected KafkaPublishAdapter kafkaEventPublisher;
 	@Autowired
 	protected EventLogRepository eventLogRepository;
 

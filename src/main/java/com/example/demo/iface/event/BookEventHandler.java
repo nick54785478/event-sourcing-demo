@@ -10,7 +10,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.base.service.BaseEventHandler;
+import com.example.demo.base.iface.event.BaseEventHandler;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.base.util.ClassParseUtil;
 import com.example.demo.domain.book.command.ReleaseBookCommand;

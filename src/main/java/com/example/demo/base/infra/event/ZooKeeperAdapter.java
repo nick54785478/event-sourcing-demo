@@ -1,4 +1,4 @@
-package com.example.demo.infra.event;
+package com.example.demo.base.infra.event;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  * */
 @Slf4j
 @Service
-public class ZooKeeperClient {
+public class ZooKeeperAdapter {
 
 	@Autowired
 	private ZooKeeper zkClient;

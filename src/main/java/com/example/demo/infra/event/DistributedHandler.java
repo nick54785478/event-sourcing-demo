@@ -10,6 +10,8 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.base.infra.event.ZooKeeperAdapter;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class DistributedHandler extends ZooKeeperClient {
+public class DistributedHandler extends ZooKeeperAdapter {
 
 	private static final String LOCK_ROOT_PATH = "/locks";
 	private static final String LOCK_NODE_NAME = "lock_";

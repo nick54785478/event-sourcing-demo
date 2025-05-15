@@ -1,4 +1,4 @@
-package com.example.demo.base.service;
+package com.example.demo.base.iface.event;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +13,8 @@ import com.example.demo.base.infra.repository.EventLogRepository;
 import com.example.demo.base.infra.repository.EventSourceRepository;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.base.util.ClassParseUtil;
+
+import lombok.AllArgsConstructor;
 
 /**
  * Base Event Handler

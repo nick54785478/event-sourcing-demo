@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.enums.EventLogSendQueueStatus;
 import com.example.demo.base.infra.repository.EventLogRepository;
-import com.example.demo.infra.event.KafkaEventPublisher;
+import com.example.demo.infra.event.KafkaPublishAdapter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +22,7 @@ public class EventRePublishSchedule {
 	@Autowired
 	private EventLogRepository eventLogRepository;
 	@Autowired
-	private KafkaEventPublisher kafkaEventPublisher;
+	private KafkaPublishAdapter kafkaEventPublisher;
 
 	@Value("${kafka.book.topic.name}")
 	private String topic;
