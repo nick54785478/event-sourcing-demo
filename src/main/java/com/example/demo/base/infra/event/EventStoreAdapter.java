@@ -16,7 +16,7 @@ import com.example.demo.base.event.BaseEvent;
  * 與 EventSource DB 交互
  */
 @Component
-public abstract class EventStoreAdaptor {
+public abstract class EventStoreAdapter {
 
 	@Autowired
 	protected EventStoreDBClient eventStoreDBClient;

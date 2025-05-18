@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.base.event.BaseEvent;
-import com.example.demo.infra.event.BookEventStorer;
+import com.example.demo.infra.event.BookEventAdapter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class TestController {
 	
 	@Autowired
-	private BookEventStorer bookEventStoreService;
+	private BookEventAdapter bookEventStoreService;
 
 	@PostMapping("/interactEventStoreDB")
 	public void testInteractEventStoreDB() throws Throwable {

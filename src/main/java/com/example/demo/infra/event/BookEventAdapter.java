@@ -13,7 +13,7 @@ import com.eventstore.dbclient.ReadResult;
 import com.eventstore.dbclient.ReadStreamOptions;
 import com.eventstore.dbclient.ResolvedEvent;
 import com.eventstore.dbclient.StreamNotFoundException;
-import com.example.demo.base.infra.event.EventStoreAdaptor;
+import com.example.demo.base.infra.event.EventStoreAdapter;
 import com.example.demo.base.util.ClassParseUtil;
 import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.snapshot.Snapshot;
@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class BookEventStorer extends EventStoreAdaptor {
+public class BookEventAdapter extends EventStoreAdapter {
 
 	/**
 	 * 加入 Event

@@ -28,7 +28,7 @@ import com.example.demo.domain.service.BookService;
 import com.example.demo.domain.share.BookCreatedData;
 import com.example.demo.domain.share.BookRenamedData;
 import com.example.demo.domain.share.BookUpdatedData;
-import com.example.demo.infra.event.BookEventStorer;
+import com.example.demo.infra.event.BookEventAdapter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BookCommandService extends BaseApplicationService {
 
 	private final BookService bookService;
-	private final BookEventStorer bookEventStoreService;
+	private final BookEventAdapter bookEventStoreService;
 
 	@Value("${kafka.book.topic.name}")
 	private String topic;
