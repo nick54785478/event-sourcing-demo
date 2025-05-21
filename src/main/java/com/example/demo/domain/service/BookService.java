@@ -18,7 +18,7 @@ import com.example.demo.domain.share.BookCreatedData;
 import com.example.demo.domain.share.BookQueriedData;
 import com.example.demo.domain.share.BookRenamedData;
 import com.example.demo.domain.share.BookUpdatedData;
-import com.example.demo.domain.snapshot.Snapshot;
+import com.example.demo.domain.snapshot.aggregate.Snapshot;
 import com.example.demo.infra.event.BookEventAdapter;
 import com.example.demo.infra.repository.BookRepository;
 import com.example.demo.infra.repository.SnapshotRepository;
@@ -55,32 +55,32 @@ public class BookService extends BaseDomainService {
 	 * @param command
 	 */
 	public void release(ReleaseBookCommand command) {
-		// 取得本次交易 Aggregate
-		Optional<Book> opt = bookRepository.findById(command.getBookId());
-		if (!opt.isPresent()) {
-			log.error(String.format("book not found (%s)", command.getBookId()));
-		} else {
-			Book book = opt.get();
-			String classType = book.getClass().getName();
-			Snapshot snapshot = Snapshot.builder().aggregateId(book.getUuid()).classType(classType)
-					.state(ClassParseUtil.serialize(book)).version(book.getVersion()).build();
-			snapshotRepository.save(snapshot);
-			try {
-				bookEventStoreService.appendBookEvent(book);
-			} catch (Throwable e) {
-				log.error("紀錄 EventSourcing 發生錯誤", e);
-			}
-
-			// TODO 版本號每 10 進行快照存取，後面自定義
-			if (book.getVersion() % 10 == 0) {
-				try {
-					bookEventStoreService.createSnapshot(snapshot);
-				} catch (Throwable e) {
-					log.error("存取快照失敗", e);
-				}
-			}
-
-		}
+//		// 取得本次交易 Aggregate
+//		Optional<Book> opt = bookRepository.findById(command.getBookId());
+//		if (!opt.isPresent()) {
+//			log.error(String.format("book not found (%s)", command.getBookId()));
+//		} else {
+//			Book book = opt.get();
+//			String classType = book.getClass().getName();
+//			Snapshot snapshot = Snapshot.builder().aggregateId(book.getUuid()).classType(classType)
+//					.state(ClassParseUtil.serialize(book)).version(book.getVersion()).build();
+//			snapshotRepository.save(snapshot);
+//			try {
+//				bookEventStoreService.appendBookEvent(book);
+//			} catch (Throwable e) {
+//				log.error("紀錄 EventSourcing 發生錯誤", e);
+//			}
+//
+//			// TODO 版本號每 10 進行快照存取，後面自定義
+//			if (book.getVersion() % 10 == 0) {
+//				try {
+//					bookEventStoreService.createSnapshot(snapshot);
+//				} catch (Throwable e) {
+//					log.error("存取快照失敗", e);
+//				}
+//			}
+//
+//		}
 	}
 
 	/**

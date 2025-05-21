@@ -2,7 +2,7 @@ package com.example.demo.domain.coupon.aggregate;
 
 import java.util.List;
 
-import com.example.demo.base.entity.BaseEntity;
+import com.example.demo.base.entity.BaseAggregateRoot;
 import com.example.demo.base.exception.ValidationException;
 import com.example.demo.domain.coupon.command.UseCouponCommand;
 
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "BOOK_COUPON")
 @NoArgsConstructor
-public class Coupon extends BaseEntity {
+public class Coupon extends BaseAggregateRoot {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

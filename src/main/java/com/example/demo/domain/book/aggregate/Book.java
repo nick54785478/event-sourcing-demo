@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 
 import com.example.demo.base.config.context.ContextHolder;
-import com.example.demo.base.entity.BaseEntity;
+import com.example.demo.base.entity.BaseAggregateRoot;
 import com.example.demo.base.event.BaseEvent;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "BOOK")
-public class Book extends BaseEntity {
+public class Book extends BaseAggregateRoot {
 
 	@Id
 	@Column(name = "UUID")

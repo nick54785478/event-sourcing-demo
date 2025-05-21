@@ -1,4 +1,4 @@
-package com.example.demo.base.infra.event;
+package com.example.demo.infra.event;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,13 +10,14 @@ import com.eventstore.dbclient.EventData;
 import com.eventstore.dbclient.EventStoreDBClient;
 import com.eventstore.dbclient.ReadStreamOptions;
 import com.eventstore.dbclient.ResolvedEvent;
+import com.example.demo.application.port.ApplicationEventStorer;
 import com.example.demo.base.event.BaseEvent;
 
 /**
  * 與 EventSource DB 交互
  */
 @Component
-public abstract class EventStoreAdapter {
+public abstract class EventStoreAdapter implements ApplicationEventStorer {
 
 	@Autowired
 	protected EventStoreDBClient eventStoreDBClient;
@@ -50,7 +51,7 @@ public abstract class EventStoreAdapter {
 	 * 從指定版本事件流中往後讀取事件
 	 * 
 	 * @param streamId 通常為 Prefix(Entity 名) + Aggregate 的唯一鍵值
-	 * @param index  版本，為 version - 1
+	 * @param index    版本，為 version - 1
 	 * @return List<ResolvedEvent> 事件列表
 	 */
 	public List<ResolvedEvent> readEvents(String streamId, Integer index) throws Throwable {

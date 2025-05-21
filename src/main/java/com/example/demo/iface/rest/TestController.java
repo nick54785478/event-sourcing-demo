@@ -26,6 +26,6 @@ public class TestController {
 
 		BaseEvent event = BaseEvent.builder().targetId(UUID.randomUUID().toString()).eventLogUuid(UUID.randomUUID().toString()).build();
 		
-		bookEventStoreService.appendEvent(aggrgateId, event);
+//		bookEventStoreService.appendEvent(aggrgateId, event);
 	}
 }

@@ -10,13 +10,13 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.application.service.BookCommandService;
 import com.example.demo.base.iface.event.BaseEventHandler;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.base.util.ClassParseUtil;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
 import com.example.demo.domain.book.outbound.BookStoredEvent;
 import com.example.demo.domain.book.outbound.BookStoredEventData;
-import com.example.demo.service.BookCommandService;
 
 import lombok.extern.slf4j.Slf4j;
 

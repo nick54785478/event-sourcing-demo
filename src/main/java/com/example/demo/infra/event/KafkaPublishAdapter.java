@@ -1,41 +1,35 @@
 package com.example.demo.infra.event;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.base.event.BaseEvent;
-import com.example.demo.base.util.ClassParseUtil;
+import com.example.demo.application.port.ApplicationEventPublisher;
+import com.example.demo.base.event.BasePublishEvent;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class KafkaPublishAdapter {
+@AllArgsConstructor
+public class KafkaPublishAdapter implements ApplicationEventPublisher {
 
-	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
 
 	/**
 	 * 發布 Event
 	 * 
-	 * @param topic Topic
-	 * @param event Event
+	 * @param event
 	 */
-	public void publish(String topic, BaseEvent event) {
-		kafkaTemplate.send(topic, ClassParseUtil.serialize(event));
-		log.debug("發布事件，message: {}", event);
-	}
-	
-	/**
-	 * 發布 Event
-	 * 
-	 * @param topic Topic
-	 * @param eventBody Event
-	 */
-	public void publish(String topic, String eventBody) {
-		kafkaTemplate.send(topic, eventBody);
-		log.debug("發布事件，message: {}", eventBody);
+	@Override
+	public void publish(BasePublishEvent event) {
+		if (StringUtils.isNotBlank(event.getPartitionIndex())) {
+			kafkaTemplate.send(event.getTopic(), event.getPartitionIndex(), event.getEvent());
+		} else {
+			kafkaTemplate.send(event.getTopic(), event.getEvent());
+		}
+		log.debug("發布事件 Topic:{}，Message: {}", event.getTopic(), event.getEvent());
 	}
 
 }

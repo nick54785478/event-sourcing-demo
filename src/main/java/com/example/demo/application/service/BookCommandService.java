@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.application.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BookCommandService extends BaseApplicationService {
 
 	private final BookService bookService;
-	private final BookEventAdapter bookEventStoreService;
+	private final BookEventAdapter bookEventStoreAdapter;
 
 	@Value("${kafka.book.topic.name}")
 	private String topic;
@@ -76,8 +76,10 @@ public class BookCommandService extends BaseApplicationService {
 	 * @return BookUpdatedData
 	 */
 	public BookUpdatedData update(UpdateBookCommand command) {
-		// 發布事件
+		
 		BookUpdatedData bookUpdatedData = bookService.update(command);
+		
+		// 發布事件
 		this.publishBookEvent();
 		return bookUpdatedData;
 	}
@@ -88,38 +90,39 @@ public class BookCommandService extends BaseApplicationService {
 	 * @param bookId
 	 */
 	public void replay(String bookId) {
-		try {
-			List<ResolvedEvent> events = new ArrayList<>();
-
-			String streamId = new Book().getClass().getSimpleName() + "-" + bookId;
-
-			// 嘗試讀取 Snapshot
-			ResolvedEvent resolvedEvent = bookEventStoreService.readSnapshot(streamId);
-			if (!Objects.isNull(resolvedEvent)) {
-				log.debug("取得 Snapshot");
-				// 取得 Snapshot
-				byte[] eventData = resolvedEvent.getEvent().getEventData();
-				Book book = ClassParseUtil.unserialize(eventData, Book.class);
-				// 版本-1為該資料的 index (若 Version=10，則為第十筆(index = 9))
-				events = bookEventStoreService.readEvents(streamId, book.getVersion() - 1);
-			} else {
-				log.debug("未取到 Snapshot，從頭開始 replay");
-				// 若未取到，從頭開始 replay
-				events = bookEventStoreService.readEvents(streamId);
-			}
-			log.info("events:{}", events);
-
-			// 防腐處理
-			List<ReplayBookCommand> commandList = events.stream().map(e -> {
-				byte[] eventData = e.getEvent().getEventData();
-				return ClassParseUtil.unserialize(eventData, ReplayBookCommand.class);
-			}).collect(Collectors.toList());
-
-			bookService.replay(commandList);
-		} catch (Throwable e) {
-			log.error("發生錯誤，Replay 失敗", e);
-			throw new ValidationException("VALIDATE_FAILED", "發生錯誤，Replay 失敗");
-		}
+//		try {
+//			List<ResolvedEvent> events = new ArrayList<>();
+//
+//			// 建立 Stream Id
+//			String streamId = new Book().getClass().getSimpleName() + "-" + bookId;
+//
+//			// 嘗試讀取 Snapshot
+//			ResolvedEvent resolvedEvent = bookEventStoreAdapter.readSnapshot(streamId);
+//			if (!Objects.isNull(resolvedEvent)) {
+//				log.debug("取得 Snapshot");
+//				// 取得 Snapshot
+//				byte[] eventData = resolvedEvent.getEvent().getEventData();
+//				Book book = ClassParseUtil.unserialize(eventData, Book.class);
+//				// 版本-1為該資料的 index (若 Version=10，則為第十筆(index = 9))
+//				events = bookEventStoreAdapter.readEvents(streamId, book.getVersion() - 1);
+//			} else {
+//				log.debug("未取到 Snapshot，從頭開始 replay");
+//				// 若未取到，從頭開始 replay
+//				events = bookEventStoreAdapter.readEvents(streamId);
+//			}
+//			log.info("events:{}", events);
+//
+//			// 防腐處理
+//			List<ReplayBookCommand> commandList = events.stream().map(e -> {
+//				byte[] eventData = e.getEvent().getEventData();
+//				return ClassParseUtil.unserialize(eventData, ReplayBookCommand.class);
+//			}).collect(Collectors.toList());
+//
+//			bookService.replay(commandList);
+//		} catch (Throwable e) {
+//			log.error("發生錯誤，Replay 失敗", e);
+//			throw new ValidationException("VALIDATE_FAILED", "發生錯誤，Replay 失敗");
+//		}
 	}
 
 	/**

@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.application.service.BookCommandService;
+import com.example.demo.application.service.BookQueryService;
+import com.example.demo.base.iface.rest.BaseController;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
@@ -25,8 +28,6 @@ import com.example.demo.iface.dto.BookUpdatedResource;
 import com.example.demo.iface.dto.CreateBookResource;
 import com.example.demo.iface.dto.RenameBookResource;
 import com.example.demo.iface.dto.UpdateBookResource;
-import com.example.demo.service.BookCommandService;
-import com.example.demo.service.BookQueryService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/book")
 @RestController
 @RequiredArgsConstructor
-public class BookController {
+public class BookController extends BaseController {
 
 	private final BookCommandService bookCommandService;
 	private final BookQueryService bookQueryService;

@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.application.port.ApplicationEventPublisher;
 import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.event.BaseEvent;
+import com.example.demo.base.event.BasePublishEvent;
 import com.example.demo.base.infra.repository.EventLogRepository;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.base.util.ClassParseUtil;
@@ -19,7 +21,7 @@ import com.example.demo.infra.event.KafkaPublishAdapter;
 public abstract class BaseApplicationService {
 
 	@Autowired
-	protected KafkaPublishAdapter kafkaEventPublisher;
+	protected ApplicationEventPublisher kafkaEventPublisher;
 	@Autowired
 	protected EventLogRepository eventLogRepository;
 
@@ -55,8 +57,9 @@ public abstract class BaseApplicationService {
 	 * @param eventLog
 	 */
 	public void publishEvent(String topic, BaseEvent event, EventLog eventLog) {
-		kafkaEventPublisher.publish(topic, event);
 		String body = ClassParseUtil.serialize(event);
+		BasePublishEvent publishEvent = BasePublishEvent.builder().topic(topic).event(body).build();
+		kafkaEventPublisher.publish(publishEvent);
 		eventLog.publish(body);
 		eventLogRepository.save(eventLog);
 	}

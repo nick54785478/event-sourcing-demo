@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.enums.EventLogSendQueueStatus;
+import com.example.demo.base.event.BasePublishEvent;
 import com.example.demo.base.infra.repository.EventLogRepository;
 import com.example.demo.infra.event.KafkaPublishAdapter;
 
@@ -41,8 +42,9 @@ public class EventRePublishSchedule {
 			eventLogList.stream().forEach(eventLog -> {
 				log.debug("Event Data: {}", eventLog.getBody());
 
+				BasePublishEvent event = BasePublishEvent.builder().topic(topic).event(eventLog.getBody()).build();
 				// Event 重發佈
-				kafkaEventPublisher.publish(topic, eventLog.getBody());
+				kafkaEventPublisher.publish(event);
 				eventLog.publish(eventLog.getBody()); // 變更狀態為: 已發布
 			});
 			eventLogRepository.saveAll(eventLogList);
