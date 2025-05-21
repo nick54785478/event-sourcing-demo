@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.base.domain.outbound.BasePublishEvent;
 import com.example.demo.base.entity.EventLog;
 import com.example.demo.base.enums.EventLogSendQueueStatus;
-import com.example.demo.base.event.BasePublishEvent;
 import com.example.demo.base.infra.repository.EventLogRepository;
 import com.example.demo.infra.event.KafkaPublishAdapter;
 

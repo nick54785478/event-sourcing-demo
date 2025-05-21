@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.demo.base.application.service.JwtTokenApplicationService;
 import com.example.demo.base.config.context.ContextHolder;
-import com.example.demo.base.service.JwtTokenService;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
 	@Autowired
-	private JwtTokenService jwtTokenService;
+	private JwtTokenApplicationService jwtTokenService;
 
 	@Value("${jwt.auth.enabled}")
 	private boolean jwtAuthEnabled;

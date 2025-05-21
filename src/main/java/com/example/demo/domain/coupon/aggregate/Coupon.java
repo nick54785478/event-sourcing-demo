@@ -2,7 +2,7 @@ package com.example.demo.domain.coupon.aggregate;
 
 import java.util.List;
 
-import com.example.demo.base.entity.BaseAggregateRoot;
+import com.example.demo.base.domain.aggregate.BaseAggregateRoot;
 import com.example.demo.base.exception.ValidationException;
 import com.example.demo.domain.coupon.command.UseCouponCommand;
 

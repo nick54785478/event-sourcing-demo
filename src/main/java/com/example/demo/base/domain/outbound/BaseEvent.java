@@ -1,4 +1,4 @@
-package com.example.demo.base.event;
+package com.example.demo.base.domain.outbound;
 
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;

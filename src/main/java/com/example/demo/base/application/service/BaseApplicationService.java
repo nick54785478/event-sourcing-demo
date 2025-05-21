@@ -1,4 +1,4 @@
-package com.example.demo.base.service;
+package com.example.demo.base.application.service;
 
 import java.util.List;
 
@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.application.port.ApplicationEventPublisher;
+import com.example.demo.base.domain.outbound.BaseEvent;
+import com.example.demo.base.domain.outbound.BasePublishEvent;
 import com.example.demo.base.entity.EventLog;
-import com.example.demo.base.event.BaseEvent;
-import com.example.demo.base.event.BasePublishEvent;
 import com.example.demo.base.infra.repository.EventLogRepository;
 import com.example.demo.base.util.BaseDataTransformer;
 import com.example.demo.base.util.ClassParseUtil;
-import com.example.demo.infra.event.KafkaPublishAdapter;
 
 /**
  * Base Application Service
@@ -21,7 +20,7 @@ import com.example.demo.infra.event.KafkaPublishAdapter;
 public abstract class BaseApplicationService {
 
 	@Autowired
-	protected ApplicationEventPublisher kafkaEventPublisher;
+	protected ApplicationEventPublisher eventPublisher;
 	@Autowired
 	protected EventLogRepository eventLogRepository;
 
@@ -52,14 +51,14 @@ public abstract class BaseApplicationService {
 	/**
 	 * 發布事件 (Event)
 	 * 
-	 * @param topic Topic 通道
-	 * @param event      事件
+	 * @param topic    Topic 通道
+	 * @param event    事件
 	 * @param eventLog
 	 */
 	public void publishEvent(String topic, BaseEvent event, EventLog eventLog) {
 		String body = ClassParseUtil.serialize(event);
 		BasePublishEvent publishEvent = BasePublishEvent.builder().topic(topic).event(body).build();
-		kafkaEventPublisher.publish(publishEvent);
+		eventPublisher.publish(publishEvent);
 		eventLog.publish(body);
 		eventLogRepository.save(eventLog);
 	}
@@ -67,14 +66,15 @@ public abstract class BaseApplicationService {
 	/**
 	 * 建立 EventLog
 	 * 
-	 * @param topicQueue Topic 通道
-	 * @param event      事件
+	 * @param topic Topic
+	 * @param event 事件
 	 * @return eventLog
 	 */
-	public EventLog generateEventLog(String topicQueue, BaseEvent event) {
+	public EventLog generateEventLog(String topic, BaseEvent event) {
 		// 建立 EventLog
-		EventLog eventLog = EventLog.builder().uuid(event.getEventLogUuid()).topic(topicQueue).targetId(event.getTargetId())
-				.className(event.getClass().getName()).body(ClassParseUtil.serialize(event)).userId("SYSTEM").build();
+		EventLog eventLog = EventLog.builder().uuid(event.getEventLogUuid()).topic(topic)
+				.targetId(event.getTargetId()).className(event.getClass().getName())
+				.body(ClassParseUtil.serialize(event)).userId("SYSTEM").build();
 		return eventLogRepository.save(eventLog);
 	}
 

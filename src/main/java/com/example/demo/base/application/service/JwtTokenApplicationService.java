@@ -1,4 +1,4 @@
-package com.example.demo.base.service;
+package com.example.demo.base.application.service;
 
 import java.util.Date;
 import java.util.List;
@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class JwtTokenService {
+public class JwtTokenApplicationService {
 
 	@Value("${jwt.secret.key}")
 	private String scretKey;

@@ -6,8 +6,8 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.base.domain.outbound.BaseEvent;
 import com.example.demo.base.entity.EventLog;
-import com.example.demo.base.event.BaseEvent;
 import com.example.demo.base.infra.event.EventIdempotentHandler;
 import com.example.demo.base.infra.repository.EventLogRepository;
 import com.example.demo.base.infra.repository.EventSourceRepository;

@@ -1,34 +1,24 @@
 package com.example.demo.application.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eventstore.dbclient.ResolvedEvent;
+import com.example.demo.application.port.ApplicationEventStorer;
+import com.example.demo.base.application.service.BaseApplicationService;
 import com.example.demo.base.config.context.ContextHolder;
+import com.example.demo.base.domain.outbound.BaseEvent;
 import com.example.demo.base.entity.EventLog;
-import com.example.demo.base.event.BaseEvent;
-import com.example.demo.base.exception.ValidationException;
-import com.example.demo.base.service.BaseApplicationService;
-import com.example.demo.base.util.ClassParseUtil;
-import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
-import com.example.demo.domain.book.command.ReplayBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.domain.service.BookService;
 import com.example.demo.domain.share.BookCreatedData;
 import com.example.demo.domain.share.BookRenamedData;
 import com.example.demo.domain.share.BookUpdatedData;
-import com.example.demo.infra.event.BookEventAdapter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BookCommandService extends BaseApplicationService {
 
 	private final BookService bookService;
-	private final BookEventAdapter bookEventStoreAdapter;
+	private final ApplicationEventStorer bookEventStoreAdapter;
 
 	@Value("${kafka.book.topic.name}")
 	private String topic;

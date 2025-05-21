@@ -2,7 +2,7 @@ package com.example.demo.application.service;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.base.service.BaseApplicationService;
+import com.example.demo.base.application.service.BaseApplicationService;
 import com.example.demo.domain.service.BookService;
 import com.example.demo.domain.share.BookQueriedData;
 

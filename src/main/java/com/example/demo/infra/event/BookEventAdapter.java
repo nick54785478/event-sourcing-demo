@@ -34,8 +34,9 @@ public class BookEventAdapter implements ApplicationEventStorer<Book> {
 	 */
 	@Override
 	public void appendEvent(Book aggregateRoot) throws Throwable {
-		String prefix = aggregateRoot.getClass().getName();
-		// aggregate 通常為 Prefix(Entity 名) + Aggregate 的唯一鍵值
+		// 建立前綴 - Book
+		String prefix = aggregateRoot.getClass().getSimpleName();
+		// eventStreamId 通常為 Prefix(Entity 名) + Aggregate 的唯一鍵值
 		String eventStreamId = prefix + "-" + aggregateRoot.getUuid();
 		// 構建事件數據
 		EventData eventData = EventData.builderAsJson(prefix, aggregateRoot).eventId(UUID.randomUUID()).build();

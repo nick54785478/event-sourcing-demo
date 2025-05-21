@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.base.domain.outbound.BaseEvent;
 import com.example.demo.base.entity.EventIdempotentLog;
-import com.example.demo.base.event.BaseEvent;
 import com.example.demo.base.infra.repository.EventIdempotentLogRepository;
 
 /**

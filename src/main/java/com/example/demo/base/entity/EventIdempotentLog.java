@@ -14,14 +14,12 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * EventLog 的 冪等表實體
  */
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(EventIdempotentLogId.class)
@@ -29,24 +27,24 @@ import lombok.Setter;
 @EntityListeners(AuditingEntityListener.class)
 public class EventIdempotentLog {
 
-    @Id
-    @Column(name = "UNIQUE_KEY")
-    private String uniqueKey;	// 對應 EventLog 的 UUID
-    
-    @Id
-    @Column(name = "EVENT_TYPE")
-    private String eventType;	// Event 類型
+	@Id
+	@Column(name = "UNIQUE_KEY")
+	private String uniqueKey; // 對應 EventLog 的 UUID
 
-    @Column(name = "TARGET_ID")
-    private String targetId;	// 該事件目標的 UUID (如: 火車等)
+	@Id
+	@Column(name = "EVENT_TYPE")
+	private String eventType; // Event 類型
 
-    @CreatedDate
-    @Column(name = "CREATED_DATE")
-    private Date createdDate;	// 建立時間
+	@Column(name = "TARGET_ID")
+	private String targetId; // 該事件目標的 UUID (如: 火車等)
 
-    public EventIdempotentLog(String eventType, String uniqueKey) {
-        this.eventType = eventType;
-        this.uniqueKey = uniqueKey;
-    }
+	@CreatedDate
+	@Column(name = "CREATED_DATE")
+	private Date createdDate; // 建立時間
+
+	public EventIdempotentLog(String eventType, String uniqueKey) {
+		this.eventType = eventType;
+		this.uniqueKey = uniqueKey;
+	}
 
 }
