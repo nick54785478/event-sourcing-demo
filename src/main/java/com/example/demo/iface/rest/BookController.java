@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.application.service.BookCommandService;
 import com.example.demo.application.service.BookQueryService;
 import com.example.demo.base.core.iface.BaseController;
-import com.example.demo.base.core.util.BaseDataTransformer;
+import com.example.demo.base.kernel.util.BaseDataTransformer;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;

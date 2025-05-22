@@ -5,8 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.example.demo.base.core.util.BaseDataTransformer;
 import com.example.demo.base.kernel.exception.response.BaseExceptionResponse;
+import com.example.demo.base.kernel.util.BaseDataTransformer;
 
 /**
  * 全域例外處理器

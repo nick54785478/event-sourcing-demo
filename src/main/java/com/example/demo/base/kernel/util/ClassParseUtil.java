@@ -1,4 +1,4 @@
-package com.example.demo.base.core.util;
+package com.example.demo.base.kernel.util;
 
 import java.io.IOException;
 import java.util.List;

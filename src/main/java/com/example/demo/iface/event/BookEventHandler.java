@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.application.service.BookCommandService;
 import com.example.demo.base.core.iface.BaseEventHandler;
-import com.example.demo.base.core.util.BaseDataTransformer;
-import com.example.demo.base.core.util.ClassParseUtil;
+import com.example.demo.base.kernel.util.BaseDataTransformer;
+import com.example.demo.base.kernel.util.ClassParseUtil;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
 import com.example.demo.domain.book.outbound.BookStoredEvent;
 import com.example.demo.domain.book.outbound.BookStoredEventData;
