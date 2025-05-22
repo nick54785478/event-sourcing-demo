@@ -1,4 +1,4 @@
-package com.example.demo.base.kernel.domain;
+package com.example.demo.base.kernel.domain.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

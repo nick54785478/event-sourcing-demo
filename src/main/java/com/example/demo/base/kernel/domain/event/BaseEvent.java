@@ -1,4 +1,4 @@
-package com.example.demo.base.kernel.domain;
+package com.example.demo.base.kernel.domain.event;
 
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;

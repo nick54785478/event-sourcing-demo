@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.base.kernel.domain.BaseEvent;
 import com.example.demo.base.kernel.domain.EventIdempotentLog;
+import com.example.demo.base.kernel.domain.event.BaseEvent;
 
 /**
  * Event Idempotent Service 用於執行冪等機制的 Service，防止重複消費的副作用

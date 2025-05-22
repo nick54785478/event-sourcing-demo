@@ -9,9 +9,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.base.core.infra.EventLogRepository;
-import com.example.demo.base.kernel.domain.BasePublishEvent;
 import com.example.demo.base.kernel.domain.EventLog;
 import com.example.demo.base.kernel.domain.enums.EventLogSendQueueStatus;
+import com.example.demo.base.kernel.domain.event.BasePublishEvent;
 import com.example.demo.infra.event.KafkaPublishAdapter;
 
 import lombok.extern.slf4j.Slf4j;

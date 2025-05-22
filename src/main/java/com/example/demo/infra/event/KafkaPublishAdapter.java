@@ -5,7 +5,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.application.port.ApplicationEventPublisher;
-import com.example.demo.base.kernel.domain.BasePublishEvent;
+import com.example.demo.base.kernel.domain.event.BasePublishEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

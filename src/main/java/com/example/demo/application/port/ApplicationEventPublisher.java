@@ -1,6 +1,6 @@
 package com.example.demo.application.port;
 
-import com.example.demo.base.kernel.domain.BasePublishEvent;
+import com.example.demo.base.kernel.domain.event.BasePublishEvent;
 
 public interface ApplicationEventPublisher {
 

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.example.demo.base.core.domain.BaseAggregateRoot;
 import com.example.demo.base.kernel.config.context.ContextHolder;
-import com.example.demo.base.kernel.domain.BaseEvent;
+import com.example.demo.base.kernel.domain.event.BaseEvent;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.ReplayBookCommand;
