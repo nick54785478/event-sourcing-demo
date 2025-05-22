@@ -10,8 +10,6 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.base.infra.event.ZooKeeperAdapter;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**

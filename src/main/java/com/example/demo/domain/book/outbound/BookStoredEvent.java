@@ -2,7 +2,7 @@ package com.example.demo.domain.book.outbound;
 
 import org.modelmapper.AbstractConverter;
 
-import com.example.demo.base.domain.outbound.BaseEvent;
+import com.example.demo.base.kernel.domain.BaseEvent;
 import com.example.demo.domain.coupon.command.UseCouponCommand;
 
 import lombok.AllArgsConstructor;

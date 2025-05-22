@@ -2,7 +2,7 @@ package com.example.demo.application.port;
 
 import java.util.List;
 
-import com.example.demo.base.domain.aggregate.BaseAggregateRoot;
+import com.example.demo.base.core.domain.BaseAggregateRoot;
 
 public interface ApplicationEventStorer<T extends BaseAggregateRoot> {
 

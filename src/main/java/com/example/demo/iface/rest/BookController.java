@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.application.service.BookCommandService;
 import com.example.demo.application.service.BookQueryService;
-import com.example.demo.base.iface.rest.BaseController;
-import com.example.demo.base.util.BaseDataTransformer;
+import com.example.demo.base.core.iface.BaseController;
+import com.example.demo.base.core.util.BaseDataTransformer;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
@@ -77,7 +77,7 @@ public class BookController extends BaseController {
 		return new ResponseEntity<>(BaseDataTransformer.transformData(responseBody, BookUpdatedResource.class),
 				HttpStatus.OK);
 	}
-	
+
 	/**
 	 * Rename a book
 	 * 
@@ -85,7 +85,7 @@ public class BookController extends BaseController {
 	 * @return ResponseEntity<BookRenamedResource>
 	 */
 	@PutMapping("/rename/{bookId}")
-	public ResponseEntity<BookRenamedResource> update( @RequestBody RenameBookResource resource) {
+	public ResponseEntity<BookRenamedResource> update(@RequestBody RenameBookResource resource) {
 		// DTO 防腐處理 (Resource > Command)
 		RenameBookCommand command = BaseDataTransformer.transformData(resource, RenameBookCommand.class);
 		// 呼叫 Application Service
@@ -110,7 +110,7 @@ public class BookController extends BaseController {
 	}
 
 	/**
-	 * Replay book 
+	 * Replay book
 	 * 
 	 * @param bookId
 	 * @param book
@@ -118,11 +118,10 @@ public class BookController extends BaseController {
 	 */
 	@PostMapping("/replay/{bookId}")
 	public ResponseEntity<BookReplayedResource> replay(@PathVariable String bookId) {
-		
+
 		// 呼叫 Application Service
 		bookCommandService.replay(bookId);
-		return new ResponseEntity<>(new BookReplayedResource(bookId),
-				HttpStatus.OK);
+		return new ResponseEntity<>(new BookReplayedResource(bookId), HttpStatus.OK);
 	}
 
 }

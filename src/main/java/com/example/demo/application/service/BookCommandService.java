@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.application.port.ApplicationEventStorer;
-import com.example.demo.base.application.service.BaseApplicationService;
-import com.example.demo.base.config.context.ContextHolder;
-import com.example.demo.base.domain.outbound.BaseEvent;
-import com.example.demo.base.entity.EventLog;
+import com.example.demo.base.core.application.BaseApplicationService;
+import com.example.demo.base.kernel.config.context.ContextHolder;
+import com.example.demo.base.kernel.domain.BaseEvent;
+import com.example.demo.base.kernel.domain.EventLog;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;

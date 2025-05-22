@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.example.demo.base.domain.service.BaseDomainService;
-import com.example.demo.base.exception.ValidationException;
+import com.example.demo.base.core.domain.service.BaseDomainService;
+import com.example.demo.base.kernel.exception.ValidationException;
 import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
