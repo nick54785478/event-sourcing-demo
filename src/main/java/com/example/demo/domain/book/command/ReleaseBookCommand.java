@@ -1,16 +1,24 @@
 package com.example.demo.domain.book.command;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.Map;
 
-@Getter
-@Setter
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReleaseBookCommand {
 
+	private String eventType;
+
 	private String bookId;
-	
+
+	private String couponNo;
+
+	private Map<String, Object> updateMap;
+
 }

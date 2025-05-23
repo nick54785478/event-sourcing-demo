@@ -1,6 +1,7 @@
 package com.example.demo.infra.event;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class BookEventAdapter implements ApplicationEventStorer<Book> {
+public class BookEventStoreAdapter implements ApplicationEventStorer<Book> {
 
 	@Autowired
 	private EventStoreDBClient eventStoreDBClient;
@@ -30,50 +31,25 @@ public class BookEventAdapter implements ApplicationEventStorer<Book> {
 	/**
 	 * 加入 Event
 	 * 
-	 * @param root Aggregate 根實體
+	 * @param eventType  事件類型
+	 * @param root       Aggregate 根實體
+	 * @param updatedMap 被變更的資料(欄位, 更改後的值)
 	 */
 	@Override
-	public void appendEvent(Book aggregateRoot) throws Throwable {
+	public void appendEvent(String eventType, Book aggregateRoot, Map<String, Object> updatedMap) throws Throwable {
 		// 建立前綴 - Book
 		String prefix = aggregateRoot.getClass().getSimpleName();
+
 		// eventStreamId 通常為 Prefix(Entity 名) + Aggregate 的唯一鍵值
 		String eventStreamId = prefix + "-" + aggregateRoot.getUuid();
+
 		// 構建事件數據
-		EventData eventData = EventData.builderAsJson(prefix, aggregateRoot).eventId(UUID.randomUUID()).build();
+		EventData eventData = EventData.builderAsJson(eventType, updatedMap).eventId(UUID.randomUUID()).build();
+
 		// 存入 Event Store DB (key, data)
 		eventStoreDBClient.appendToStream(eventStreamId, eventData).get();
 
 	}
-
-//	/**
-//	 * 加入 Event
-//	 * 
-//	 * @param root Aggregate 根實體
-//	 */
-//	public void appendBookEvent(Book book) throws Throwable {
-//		// 取得前綴
-//		String prefix = book.getClass().getSimpleName();
-//		// aggregate 通常為 Prefix(Entity 名) + Aggregate 的唯一鍵值
-//		String eventStreamId = prefix + "-" + book.getUuid();
-//		// 構建事件數據
-//		EventData eventData = EventData.builderAsJson(prefix, book).eventId(UUID.randomUUID()).build();
-//		// 存入 Event Store DB (key, data)
-//		eventStoreDBClient.appendToStream(eventStreamId, eventData).get();
-//	}
-
-	/**
-	 * 建立 SnapShot(快照)
-	 * 
-	 * @param snapshot
-	 */
-//	public void createSnapshot(Snapshot snapshot) throws Throwable {
-//		Book book = ClassParseUtil.unserialize(snapshot.getState(), Book.class);
-//		// 儲存快照到 Event Store DB
-//		EventData snapshotEventData = EventData.builderAsJson("Snapshot", book).eventId(UUID.randomUUID()).build();
-//		// 寫入快照流
-//		String snapshotStreamId = book.getClass().getSimpleName() + "-" + snapshot.getAggregateId() + "_snapshot";
-//		eventStoreDBClient.appendToStream(snapshotStreamId, snapshotEventData).get();
-//	}
 
 	/**
 	 * 建立 SnapShot(快照)
@@ -83,8 +59,12 @@ public class BookEventAdapter implements ApplicationEventStorer<Book> {
 	 */
 	@Override
 	public void createSnapshot(Book book, String snapshotStreamId) throws Throwable {
+		// 建立前綴 - Book
+		String prefix = book.getClass().getSimpleName();
+
 		// 儲存快照到 Event Store DB
-		EventData snapshotEventData = EventData.builderAsJson("Snapshot", book).eventId(UUID.randomUUID()).build();
+		EventData snapshotEventData = EventData.builderAsJson(prefix + "-snapshot", book)
+				.eventId(UUID.randomUUID()).build();
 		// 寫入快照流
 		eventStoreDBClient.appendToStream(snapshotStreamId, snapshotEventData).get();
 	}

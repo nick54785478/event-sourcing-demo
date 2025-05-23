@@ -9,7 +9,6 @@ import com.example.demo.base.core.domain.service.BaseDomainService;
 import com.example.demo.base.kernel.exception.ValidationException;
 import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.book.command.CreateBookCommand;
-import com.example.demo.domain.book.command.ReleaseBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.ReplayBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
@@ -17,9 +16,8 @@ import com.example.demo.domain.share.BookCreatedData;
 import com.example.demo.domain.share.BookQueriedData;
 import com.example.demo.domain.share.BookRenamedData;
 import com.example.demo.domain.share.BookUpdatedData;
-import com.example.demo.infra.event.BookEventAdapter;
+import com.example.demo.infra.event.BookEventStoreAdapter;
 import com.example.demo.infra.repository.BookRepository;
-import com.example.demo.infra.repository.SnapshotRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BookService extends BaseDomainService {
 
 	private BookRepository bookRepository;
-	private SnapshotRepository snapshotRepository;
-	private BookEventAdapter bookEventStoreService;
+	private BookEventStoreAdapter bookEventAdapter;
 
 	/**
 	 * 新增書籍資料
@@ -44,42 +41,9 @@ public class BookService extends BaseDomainService {
 		Book book = new Book();
 		book.create(command);
 		Book saved = bookRepository.save(book);
-		return new BookCreatedData(saved.getUuid());
+		return this.transformEntityToData(saved, BookCreatedData.class);
 	}
 
-	/**
-	 * 更新版本號並儲存版本資訊
-	 * 
-	 * @param command
-	 */
-	public void release(ReleaseBookCommand command) {
-		// 取得本次交易 Aggregate
-		Optional<Book> opt = bookRepository.findById(command.getBookId());
-		if (!opt.isPresent()) {
-			log.error(String.format("book not found (%s)", command.getBookId()));
-		} else {
-			Book book = opt.get();
-			try {
-				bookEventStoreService.appendEvent(book);
-			} catch (Throwable e) {
-				log.error("紀錄 EventSourcing 發生錯誤", e);
-			}
-			
-//			Snapshot snapshot = Snapshot.builder().aggregateId(book.getUuid()).classType(classType)
-//					.state(ClassParseUtil.serialize(book)).version(book.getVersion()).build();
-//			snapshotRepository.save(snapshot);
-			
-//			// TODO 版本號每 10 進行快照存取，後面自定義
-//			if (book.getVersion() % 10 == 0) {
-//				try {
-//					bookEventStoreService.createSnapshot(snapshot);
-//				} catch (Throwable e) {
-//					log.error("存取快照失敗", e);
-//				}
-//			}
-
-		}
-	}
 
 	/**
 	 * 更新書籍資料
@@ -96,7 +60,7 @@ public class BookService extends BaseDomainService {
 			Book book = opt.get();
 			book.update(command);
 			Book saved = bookRepository.save(book);
-			return new BookUpdatedData(saved.getUuid());
+			return this.transformEntityToData(saved, BookUpdatedData.class);
 		}
 	}
 

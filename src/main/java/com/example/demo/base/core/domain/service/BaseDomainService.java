@@ -10,7 +10,7 @@ import com.example.demo.base.core.infra.EventSourceRepository;
 import com.example.demo.base.kernel.domain.EventLog;
 import com.example.demo.base.kernel.domain.event.BaseEvent;
 import com.example.demo.base.kernel.util.BaseDataTransformer;
-import com.example.demo.base.kernel.util.ClassParseUtil;
+import com.example.demo.base.kernel.util.ObjectMapperUtil;
 
 /**
  * Base Domain Service
@@ -60,7 +60,7 @@ public abstract class BaseDomainService {
 	public EventLog generateEventLog(String topicQueue, String eventLogUuid, String targetId, BaseEvent event) {
 		// 建立 EventLog
 		EventLog eventLog = EventLog.builder().uuid(eventLogUuid).topic(topicQueue).targetId(targetId)
-				.className(event.getClass().getName()).body(ClassParseUtil.serialize(event)).userId("SYSTEM").build();
+				.className(event.getClass().getName()).body(ObjectMapperUtil.serialize(event)).userId("SYSTEM").build();
 		return eventLogRepository.save(eventLog);
 	}
 }

@@ -12,7 +12,7 @@ import com.example.demo.base.core.infra.EventSourceRepository;
 import com.example.demo.base.kernel.domain.EventLog;
 import com.example.demo.base.kernel.domain.event.BaseEvent;
 import com.example.demo.base.kernel.util.BaseDataTransformer;
-import com.example.demo.base.kernel.util.ClassParseUtil;
+import com.example.demo.base.kernel.util.ObjectMapperUtil;
 
 /**
  * Base Event Handler
@@ -71,7 +71,7 @@ public class BaseEventHandler {
 		// 建立 EventLog
 		EventLog eventLog = EventLog.builder().uuid(event.getEventLogUuid()).topic(topicQueue)
 				.targetId(event.getTargetId()).className(event.getClass().getName())
-				.body(ClassParseUtil.serialize(event)).userId("SYSTEM").build();
+				.body(ObjectMapperUtil.serialize(event)).userId("SYSTEM").build();
 		return eventLogRepository.save(eventLog);
 	}
 
@@ -80,9 +80,7 @@ public class BaseEventHandler {
 	 * 
 	 * @param eventLogUuid
 	 */
-	public void consumeEvent(String eventLogUuid) {
-		// 查詢 EventLog
-		EventLog eventLog = eventLogRepository.findByUuid(eventLogUuid);
+	public void consumeEvent(EventLog eventLog) {
 		if (!Objects.isNull(eventLog)) {
 			eventLog.consume(); // 更改狀態為: 已消費
 			eventLogRepository.save(eventLog);

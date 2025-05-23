@@ -11,7 +11,7 @@ import com.example.demo.base.kernel.domain.EventLog;
 import com.example.demo.base.kernel.domain.event.BaseEvent;
 import com.example.demo.base.kernel.domain.event.BasePublishEvent;
 import com.example.demo.base.kernel.util.BaseDataTransformer;
-import com.example.demo.base.kernel.util.ClassParseUtil;
+import com.example.demo.base.kernel.util.ObjectMapperUtil;
 
 /**
  * Base Application Service
@@ -56,7 +56,7 @@ public abstract class BaseApplicationService {
 	 * @param eventLog
 	 */
 	public void publishEvent(String topic, BaseEvent event, EventLog eventLog) {
-		String body = ClassParseUtil.serialize(event);
+		String body = ObjectMapperUtil.serialize(event);
 		BasePublishEvent publishEvent = BasePublishEvent.builder().topic(topic).event(body).build();
 		eventPublisher.publish(publishEvent);
 		eventLog.publish(body);
@@ -74,7 +74,7 @@ public abstract class BaseApplicationService {
 		// 建立 EventLog
 		EventLog eventLog = EventLog.builder().uuid(event.getEventLogUuid()).topic(topic)
 				.targetId(event.getTargetId()).className(event.getClass().getName())
-				.body(ClassParseUtil.serialize(event)).userId("SYSTEM").build();
+				.body(ObjectMapperUtil.serialize(event)).userId("SYSTEM").build();
 		return eventLogRepository.save(eventLog);
 	}
 

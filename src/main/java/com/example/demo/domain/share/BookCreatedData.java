@@ -9,5 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BookCreatedData {
 
-	private String uuid;
+	private String uuid; // PK uuid
+
+	private String name; // 姓名
+
+	private String author; // 作者
+
+	private String isbn; // isbn
+
+	private Integer version;
 }

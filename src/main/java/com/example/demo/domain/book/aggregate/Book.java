@@ -12,6 +12,8 @@ import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.ReplayBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
+import com.example.demo.domain.book.outbound.BookCreatedEvent;
+import com.example.demo.domain.book.outbound.BookCreatedEventData;
 import com.example.demo.domain.book.outbound.BookStoredEvent;
 import com.example.demo.domain.book.outbound.BookStoredEventData;
 
@@ -78,8 +80,8 @@ public class Book extends BaseAggregateRoot {
 		String couponNo = (command.getCouponNo() != null) ? command.getCouponNo() : null;
 
 		// 註冊 Domain Event（當有 Next Event 需要發佈時）
-		BaseEvent event = BookStoredEvent.builder().eventLogUuid(UUID.randomUUID().toString()).targetId(this.u) // 呼叫新增事件
-				.data(new BookStoredEventData(this.u, couponNo)).build();
+		BaseEvent event = BookCreatedEvent.builder().eventLogUuid(UUID.randomUUID().toString()).targetId(this.u) // 呼叫新增事件
+				.data(new BookCreatedEventData(this.u, couponNo)).build();
 
 		ContextHolder.setEvent(event);
 	}

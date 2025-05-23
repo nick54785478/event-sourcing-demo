@@ -1,6 +1,7 @@
 package com.example.demo.application.port;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.demo.base.core.domain.BaseAggregateRoot;
 
@@ -9,10 +10,12 @@ public interface ApplicationEventStorer<T extends BaseAggregateRoot> {
 	/**
 	 * 加入 Event
 	 * 
-	 * @param aggregateRoot Aggregate Root 的繼承類
+	 * @param eventType     事件類型
+	 * @param aggregateRoot 聚合根的繼承類
+	 * @param map           被變更的資料
 	 * @throws Throwable
 	 */
-	void appendEvent(T aggregateRoot) throws Throwable;
+	void appendEvent(String eventType, T aggregateRoot, Map<String, Object> updatedMap) throws Throwable;
 
 	/**
 	 * 從指定事件流中讀取事件

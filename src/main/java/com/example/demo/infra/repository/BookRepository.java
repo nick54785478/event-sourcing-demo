@@ -9,4 +9,6 @@ import com.example.demo.domain.book.aggregate.Book;
 public interface BookRepository extends JpaRepository<Book, String> {
 
 	void deleteByUuid(String uuid);
+
+	Book findByUuid(String uuid);
 }

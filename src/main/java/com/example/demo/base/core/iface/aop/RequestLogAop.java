@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Aspect
 @Component
-public class RequestLogInterceptor {
+public class RequestLogAop {
 
 	/**
 	 * 定義切入點，針對帶有 @RestController 注解的類進行切入。

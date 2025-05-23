@@ -3,7 +3,7 @@ package com.example.demo.iface.schedule;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.infra.event.BookEventAdapter;
+import com.example.demo.infra.event.BookEventStoreAdapter;
 import com.example.demo.infra.repository.SnapshotRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SnapshotSchedule {
 	
 	private SnapshotRepository snapshotRepository;
-	private BookEventAdapter bookEventStoreService;
+	private BookEventStoreAdapter bookEventStoreService;
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void saveBookSnapshots() {

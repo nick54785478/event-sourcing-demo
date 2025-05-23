@@ -120,7 +120,7 @@ public class BookController extends BaseController {
 	public ResponseEntity<BookReplayedResource> replay(@PathVariable String bookId) {
 
 		// 呼叫 Application Service
-		bookCommandService.replay(bookId);
+//		bookCommandService.replay(bookId);
 		return new ResponseEntity<>(new BookReplayedResource(bookId), HttpStatus.OK);
 	}
 
