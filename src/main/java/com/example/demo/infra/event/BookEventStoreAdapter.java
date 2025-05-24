@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,12 @@ import com.eventstore.dbclient.EventData;
 import com.eventstore.dbclient.EventStoreDBClient;
 import com.eventstore.dbclient.ReadResult;
 import com.eventstore.dbclient.ReadStreamOptions;
+import com.eventstore.dbclient.RecordedEvent;
 import com.eventstore.dbclient.ResolvedEvent;
-import com.eventstore.dbclient.StreamNotFoundException;
 import com.example.demo.application.port.ApplicationEventStorer;
 import com.example.demo.base.kernel.domain.event.BaseReadEventCommand;
 import com.example.demo.base.kernel.domain.event.BaseSnapshotResource;
+import com.example.demo.base.kernel.util.BaseDataTransformer;
 import com.example.demo.domain.book.aggregate.Book;
 
 import lombok.extern.slf4j.Slf4j;
@@ -72,43 +74,56 @@ public class BookEventStoreAdapter implements ApplicationEventStorer<Book> {
 	}
 
 	/**
-	 * 讀取快照資料
+	 * 從指定版本事件流中往後讀取事件
 	 * 
-	 * @param snapshotStreamId
-	 * @return 目前最新的快照
+	 * @param resource
+	 * @return List<BaseSnapshotResource> 事件列表
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 */
-	public ResolvedEvent readSnapshot(String aggregateId) {
+	@Override
+	public List<BaseSnapshotResource> readEvents(BaseReadEventCommand command)
+			throws InterruptedException, ExecutionException {
+		// 根據是否有指定 index 來決定從哪裡開始讀取，若沒有 index， 就從事件流開頭讀到尾部（可依需求調整）
+		ReadStreamOptions options = (command.getIndex() != null)
+				? ReadStreamOptions.get().forwards().fromRevision(command.getIndex())
+				: ReadStreamOptions.get().forwards().fromStart();
+		ReadResult readResult = eventStoreDBClient.readStream(command.getStreamId(), options).get();
+		return readResult.getEvents().stream()
+				.map(event -> BaseDataTransformer.transformData(event.getEvent(), BaseSnapshotResource.class))
+				.collect(Collectors.toList());
+	}
 
-		try {
-			String snapshotStreamId = aggregateId + "_snapshot";
-			// 從快照流讀取最新的快照
-			ReadStreamOptions options = ReadStreamOptions.get().backwards().fromEnd(); // 從流的尾部開始往回讀
-			CompletableFuture<ReadResult> snapshot = eventStoreDBClient.readStream(snapshotStreamId, options);
+	/**
+	 * 讀取 Book 快照
+	 * 
+	 * @param command
+	 * @throws ExecutionException
+	 * @throws InterruptedException
+	 */
+	@Override
+	public BaseSnapshotResource readSnapshot(BaseReadEventCommand command)
+			throws InterruptedException, ExecutionException {
 
-			if (Objects.isNull(snapshot)) {
-				return null; // 沒有快照
-			} else {
-				List<ResolvedEvent> snapshotEvents = snapshot.get().getEvents();
-				// 取得最新的快照
-				return snapshotEvents.get(snapshotEvents.size() - 1);
-			}
-
-		} catch (InterruptedException | ExecutionException | StreamNotFoundException e) {
-			log.info("沒有快照，回傳 null，重頭執行 Replay", e);
+		// 根據是否有指定 index 來決定從哪裡開始讀取，若沒有 index， 就從事件流開頭讀到尾部（可依需求調整）
+		ReadStreamOptions options = (command.getIndex() != null)
+				? ReadStreamOptions.get().forwards().fromRevision(command.getIndex())
+				: ReadStreamOptions.get().forwards().fromStart();
+		CompletableFuture<ReadResult> snapshot = eventStoreDBClient.readStream(command.getStreamId() + "-snapshot",
+				options);
+		// 沒有快照
+		if (Objects.isNull(snapshot)) {
 			return null;
 		}
-	}
 
-	@Override
-	public List<?> readEvents(BaseReadEventCommand command) throws Throwable {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		// 取得
+		List<ResolvedEvent> snapshotEvents = snapshot.get().getEvents();
+		// 取得最新的快照資料
+		ResolvedEvent resolvedEvent = snapshotEvents.get(snapshotEvents.size() - 1);
+		RecordedEvent event = resolvedEvent.getEvent();
 
-	@Override
-	public BaseSnapshotResource readSnapshot(BaseReadEventCommand command) {
-		// TODO Auto-generated method stub
-		return null;
+		return BaseDataTransformer.transformData(event, BaseSnapshotResource.class);
+
 	}
 
 }

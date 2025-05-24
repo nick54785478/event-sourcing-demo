@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import com.eventstore.dbclient.StreamNotFoundException;
 import com.example.demo.base.core.domain.BaseAggregateRoot;
 import com.example.demo.base.kernel.domain.event.BaseReadEventCommand;
 import com.example.demo.base.kernel.domain.event.BaseSnapshotResource;
@@ -27,9 +28,10 @@ public interface ApplicationEventStorer<T extends BaseAggregateRoot> {
 	 * 
 	 * @param resource
 	 * @return List<?> 事件列表
-	 * @throws Throwable
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 */
-	List<?> readEvents(BaseReadEventCommand command) throws Throwable;
+	List<?> readEvents(BaseReadEventCommand command) throws InterruptedException, ExecutionException;
 
 	/**
 	 * 建立快照
@@ -44,7 +46,11 @@ public interface ApplicationEventStorer<T extends BaseAggregateRoot> {
 	 * 讀取快照
 	 * 
 	 * @param command 用來查詢快照 (封裝 Stream Id 、 Index)
+	 * @throws ExecutionException
+	 * @throws InterruptedException
+	 * @throws StreamNotFoundException
 	 */
-	BaseSnapshotResource readSnapshot(BaseReadEventCommand command);
+	BaseSnapshotResource readSnapshot(BaseReadEventCommand command)
+			throws InterruptedException, ExecutionException, StreamNotFoundException;
 
 }

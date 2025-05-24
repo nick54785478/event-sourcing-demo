@@ -15,21 +15,17 @@ import com.example.demo.application.service.BookQueryService;
 import com.example.demo.base.core.iface.BaseController;
 import com.example.demo.base.kernel.util.BaseDataTransformer;
 import com.example.demo.domain.book.command.CreateBookCommand;
-import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.ReprintBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.domain.share.BookCreatedData;
-import com.example.demo.domain.share.BookRenamedData;
 import com.example.demo.domain.share.BookReprintedData;
 import com.example.demo.domain.share.BookUpdatedData;
 import com.example.demo.iface.dto.BookCreatedResource;
 import com.example.demo.iface.dto.BookQueriedResource;
-import com.example.demo.iface.dto.BookRenamedResource;
 import com.example.demo.iface.dto.BookReplayedResource;
 import com.example.demo.iface.dto.BookReprintedResource;
 import com.example.demo.iface.dto.BookUpdatedResource;
 import com.example.demo.iface.dto.CreateBookResource;
-import com.example.demo.iface.dto.RenameBookResource;
 import com.example.demo.iface.dto.ReprintBookResource;
 import com.example.demo.iface.dto.UpdateBookResource;
 
@@ -94,23 +90,6 @@ public class BookController extends BaseController {
 
 		// DTO 防腐處理 (Domain > DTO)，並回傳
 		return new ResponseEntity<>(BaseDataTransformer.transformData(responseBody, BookUpdatedResource.class),
-				HttpStatus.OK);
-	}
-
-	/**
-	 * Rename a book
-	 * 
-	 * @param resource
-	 * @return ResponseEntity<BookRenamedResource>
-	 */
-	@PutMapping("/rename/{bookId}")
-	public ResponseEntity<BookRenamedResource> update(@RequestBody RenameBookResource resource) {
-		// DTO 防腐處理 (Resource > Command)
-		RenameBookCommand command = BaseDataTransformer.transformData(resource, RenameBookCommand.class);
-		// 呼叫 Application Service
-		BookRenamedData responseBody = bookCommandService.rename(command);
-		// DTO 防腐處理 (Domain > DTO)，並回傳
-		return new ResponseEntity<>(BaseDataTransformer.transformData(responseBody, BookRenamedResource.class),
 				HttpStatus.OK);
 	}
 

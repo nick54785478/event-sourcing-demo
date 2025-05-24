@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BaseReadEventCommand {
 
-	private String streamId;  // Stream Id (通常為 AggregateId 或 Snapshot Id)
+	private String streamId;  // Stream Id (通常為 AggregateId)
 	
-	private Integer index;  // version 版本號
+	private Integer index;  // 快照索引 (從 0 開始)
 }

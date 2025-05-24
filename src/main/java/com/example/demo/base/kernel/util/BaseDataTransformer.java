@@ -3,7 +3,10 @@ package com.example.demo.base.kernel.util;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
@@ -118,6 +121,15 @@ public class BaseDataTransformer {
 					log.error("轉換 BigDecimal 為 String 失敗", e);
 					return null;
 				}
+			}
+		});
+
+		// 設置 Instant -> ZonedDateTime  的 Converter
+		modelMapper.addConverter(new Converter<Instant, ZonedDateTime>() {
+			@Override
+			public ZonedDateTime convert(MappingContext<Instant, ZonedDateTime> context) {
+				return context.getSource() == null ? null
+						: context.getSource().atZone(ZoneOffset.UTC);
 			}
 		});
 

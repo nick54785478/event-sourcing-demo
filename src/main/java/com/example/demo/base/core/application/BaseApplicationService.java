@@ -1,6 +1,9 @@
 package com.example.demo.base.core.application;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,9 +16,12 @@ import com.example.demo.base.kernel.domain.event.BasePublishEvent;
 import com.example.demo.base.kernel.util.BaseDataTransformer;
 import com.example.demo.base.kernel.util.ObjectMapperUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Base Application Service
  */
+@Slf4j
 @Service
 public abstract class BaseApplicationService {
 
@@ -23,7 +29,7 @@ public abstract class BaseApplicationService {
 	protected ApplicationEventPublisher eventPublisher;
 	@Autowired
 	protected EventLogRepository eventLogRepository;
-	
+
 	/**
 	 * 呼叫 BaseDataTransformer 進行資料轉換
 	 * 
@@ -72,10 +78,37 @@ public abstract class BaseApplicationService {
 	 */
 	public EventLog generateEventLog(String topic, BaseEvent event) {
 		// 建立 EventLog
-		EventLog eventLog = EventLog.builder().uuid(event.getEventLogUuid()).topic(topic)
-				.targetId(event.getTargetId()).className(event.getClass().getName())
-				.body(ObjectMapperUtil.serialize(event)).userId("SYSTEM").build();
+		EventLog eventLog = EventLog.builder().uuid(event.getEventLogUuid()).topic(topic).targetId(event.getTargetId())
+				.className(event.getClass().getName()).body(ObjectMapperUtil.serialize(event)).userId("SYSTEM").build();
 		return eventLogRepository.save(eventLog);
+	}
+
+	/**
+	 * 比對 先前資料 與 目標資料
+	 * 
+	 * @param source 先前資料
+	 * @param target 目標資料
+	 * @return Map<Entity欄位, 值>
+	 */
+	protected Map<String, Object> compareAggregateRoot(Object source, Object target) {
+		Map<String, Object> differences = new LinkedHashMap<>();
+		try {
+			Map<String, Object> sourceMap = ObjectMapperUtil.convertToMap(source);
+			Map<String, Object> targetMap = ObjectMapperUtil.convertToMap(target);
+
+			for (String key : sourceMap.keySet()) {
+				if (targetMap.containsKey(key)) {
+					Object before = sourceMap.get(key);
+					Object after = targetMap.get(key);
+					if (!Objects.equals(before, after)) {
+						differences.put(key, after);
+					}
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			log.error("物件轉換比對失敗", e);
+		}
+		return differences;
 	}
 
 }

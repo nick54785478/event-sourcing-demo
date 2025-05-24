@@ -9,13 +9,11 @@ import com.example.demo.base.core.domain.service.BaseDomainService;
 import com.example.demo.base.kernel.exception.ValidationException;
 import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.book.command.CreateBookCommand;
-import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.ReplayBookCommand;
 import com.example.demo.domain.book.command.ReprintBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.domain.share.BookCreatedData;
 import com.example.demo.domain.share.BookQueriedData;
-import com.example.demo.domain.share.BookRenamedData;
 import com.example.demo.domain.share.BookReprintedData;
 import com.example.demo.domain.share.BookUpdatedData;
 import com.example.demo.infra.event.BookEventStoreAdapter;
@@ -57,7 +55,6 @@ public class BookService extends BaseDomainService {
 		if (!opt.isPresent()) {
 			throw new ValidationException("VALIDATE_FAILED", String.format("book not found (%s)", command.getBookId()));
 		} else {
-			// 叫用 Command Handler
 			Book book = opt.get();
 			book.reprint(command);
 			Book saved = bookRepository.save(book);
@@ -100,26 +97,6 @@ public class BookService extends BaseDomainService {
 			log.error(String.format("book not found (%s)", bookId));
 			throw new ValidationException(ValidationException.VALIDATE_FAILED,
 					String.format("book not found (%s)", bookId));
-		}
-
-	}
-
-	/**
-	 * Rename a Book
-	 * 
-	 * @param command
-	 */
-	public BookRenamedData rename(RenameBookCommand command) {
-
-		Optional<Book> opt = bookRepository.findById(command.getBookId());
-		if (!opt.isPresent()) {
-			throw new ValidationException("VALIDATE_FAILED", String.format("book not found (%s)", command.getBookId()));
-		} else {
-			// 叫用 Command Handler
-			Book book = opt.get();
-			book.rename(command);
-			Book saved = bookRepository.save(book);
-			return new BookRenamedData(saved.getUuid());
 		}
 
 	}

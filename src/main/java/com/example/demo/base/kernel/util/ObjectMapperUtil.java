@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 public class ObjectMapperUtil {
 
 	protected static final ObjectMapper mapper = new ObjectMapper();
+
+	static {
+		mapper.registerModule(new JavaTimeModule());
+	}
 
 	/**
 	 * 序列化物件 為 JSON 字串

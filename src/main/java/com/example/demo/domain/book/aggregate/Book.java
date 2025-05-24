@@ -1,15 +1,14 @@
 package com.example.demo.domain.book.aggregate;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.example.demo.base.core.domain.BaseAggregateRoot;
 import com.example.demo.base.kernel.config.context.ContextHolder;
 import com.example.demo.base.kernel.domain.event.BaseEvent;
+import com.example.demo.domain.book.command.ApplyBookCommand;
 import com.example.demo.domain.book.command.CreateBookCommand;
-import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.ReplayBookCommand;
 import com.example.demo.domain.book.command.ReprintBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
@@ -53,7 +52,7 @@ public class Book extends BaseAggregateRoot {
 
 	@Column(name = "ISBN")
 	private String isbn; // isbn
-	
+
 	@Column(name = "VERSION")
 	private Integer version = 0;
 
@@ -68,7 +67,9 @@ public class Book extends BaseAggregateRoot {
 	}
 
 	/**
-	 * Constructor Command Handler. registers Event
+	 * 新增 Book 資料，註冊新增事件
+	 * 
+	 * @param command
 	 */
 	public void create(CreateBookCommand command) {
 		this.u = UUID.randomUUID().toString();
@@ -83,29 +84,11 @@ public class Book extends BaseAggregateRoot {
 		// 註冊 Domain Event（當有 Next Event 需要發佈時）
 		BaseEvent event = BookCreatedEvent.builder().eventLogUuid(UUID.randomUUID().toString()).targetId(this.u) // 呼叫新增事件
 				.data(new BookCreatedEventData(this.u, couponNo)).build();
-
 		ContextHolder.setEvent(event);
 	}
 
 	/**
-	 * 更新 Book 資料
-	 * 
-	 * @param command
-	 */
-	public void update(UpdateBookCommand command) {
-		this.name = command.getName();
-		this.author = command.getAuthor();
-		this.isbn = command.getIsbn();
-		this.version += 1;
-
-		// 註冊 Domain Event（當有 Next Event 需要發佈時）
-		BaseEvent event = BookReprintedEvent.builder().eventLogUuid(UUID.randomUUID().toString()).targetId(this.uuid)
-				.data(new BookReprintedEventData(this.uuid)).build();
-		ContextHolder.setEvent(event);
-	}
-	
-	/**
-	 * 更新 Book 資料
+	 * 更版 Book 資料，註冊更版事件
 	 * 
 	 * @param command
 	 */
@@ -121,6 +104,30 @@ public class Book extends BaseAggregateRoot {
 		ContextHolder.setEvent(event);
 	}
 
+	/**
+	 * 更新 Book 資料
+	 * 
+	 * @param command
+	 */
+	public void update(UpdateBookCommand command) {
+		this.name = command.getName();
+		this.author = command.getAuthor();
+		this.isbn = command.getIsbn();
+	}
+
+	/**
+	 * 將 Events 更新到 Book 中
+	 * 
+	 * @param applyCommands
+	 */
+	public void apply(List<ApplyBookCommand> applyCommands) {
+		applyCommands.stream().forEach(command -> {
+			this.name = Objects.isNull(command.getName()) ? this.name : command.getName();
+			this.author = Objects.isNull(command.getAuthor()) ? this.author : command.getAuthor();
+			this.isbn = Objects.isNull(command.getIsbn()) ? this.isbn : command.getIsbn();
+			this.version = command.getVersion();
+		});
+	}
 
 	/**
 	 * replay EventSourcing
@@ -136,23 +143,6 @@ public class Book extends BaseAggregateRoot {
 		this.version = command.getVersion();
 		this.setCreatedDate(command.getCreatedDate());
 		this.setCreatedBy(command.getCreatedBy());
-	}
-
-	/**
-	 * rename
-	 * 
-	 * @param command
-	 */
-	public void rename(RenameBookCommand command) {
-		if (StringUtils.isNotBlank(command.getName())) {
-			this.name = command.getName();
-			this.version += 1;
-
-			// 註冊 Domain Event（當有 Next Event 需要發佈時）
-			BaseEvent event = BookReprintedEvent.builder().eventLogUuid(UUID.randomUUID().toString()).targetId(this.uuid)
-					.data(new BookReprintedEventData(this.uuid)).build();
-			ContextHolder.setEvent(event);
-		}
 	}
 
 }
