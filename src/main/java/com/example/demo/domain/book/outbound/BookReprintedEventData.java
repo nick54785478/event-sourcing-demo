@@ -4,19 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-/*
- * 放置Create事件參數
- * */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookStoredEventData {
+public class BookReprintedEventData {
 
 	private String bookId;
 	private String couponNo;
 	
-	public BookStoredEventData(String bookId) {
+	public BookReprintedEventData(String bookId) {
 		this.bookId = bookId;
 	}
 	

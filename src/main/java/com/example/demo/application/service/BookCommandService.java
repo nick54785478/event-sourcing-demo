@@ -3,7 +3,6 @@ package com.example.demo.application.service;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,12 +21,13 @@ import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
+import com.example.demo.domain.book.command.ReprintBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.domain.service.BookService;
 import com.example.demo.domain.share.BookCreatedData;
 import com.example.demo.domain.share.BookRenamedData;
+import com.example.demo.domain.share.BookReprintedData;
 import com.example.demo.domain.share.BookUpdatedData;
-import com.example.demo.infra.event.BookEventStoreAdapter;
 import com.example.demo.infra.repository.BookRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -41,14 +41,13 @@ public class BookCommandService extends BaseApplicationService {
 
 	private final BookService bookService;
 	private final BookRepository bookRepository;
-	private final BookEventStoreAdapter bookEventAdapter;
 	private final ApplicationEventStorer<Book> eventStoreAdapter;
 
 	@Value("${kafka.book.topic.name}")
-	private String topic;
+	private String bookTopic;
 
 	/**
-	 * Service Command method to create
+	 * 新增 Book 資料
 	 * 
 	 * @param command
 	 * @return BookCreatedData
@@ -58,29 +57,20 @@ public class BookCommandService extends BaseApplicationService {
 		// 新增 Book 資料
 		BookCreatedData bookCreatedData = bookService.create(command);
 		// 發布事件 進行 EventSourcing
-		this.publishBookEvent();
+		this.publishBookEvent(bookTopic);
 		return bookCreatedData;
 	}
 
 	/**
-	 * 記錄新增資料
+	 * 更版 Book
 	 * 
-	 * @param eventType
 	 * @param command
+	 * @return BookReprintedData
 	 */
-	public void recordCreatedEvent(String eventType, ReleaseBookCommand command) {
-		// 取得本次交易 Aggregate
-		Optional<Book> opt = bookRepository.findById(command.getBookId());
-		if (!opt.isPresent()) {
-			log.error(String.format("book not found (%s)", command.getBookId()));
-		} else {
-			Book book = opt.get();
-			try {
-				bookEventAdapter.appendEvent(eventType, book, command.getUpdateMap()); // Event Source 紀錄
-			} catch (Throwable e) {
-				log.error("紀錄 EventSourcing 發生錯誤", e);
-			}
-		}
+	public BookReprintedData reprint(ReprintBookCommand command) {
+		BookReprintedData bookReprintedData = bookService.reprint(command);
+		this.publishBookEvent(bookTopic); // 發布事件
+		return bookReprintedData;
 	}
 
 	/**
@@ -100,7 +90,12 @@ public class BookCommandService extends BaseApplicationService {
 					// 將物件轉為 Map
 					Map<String, Object> updatedMap = ObjectMapperUtil.convertToMap(book);
 					try {
+						// EventStoreDB 儲存資料
 						eventStoreAdapter.appendEvent(clazz.getSimpleName(), book, updatedMap);
+
+						// 第一筆存取 Snapshot，存取到 EventStoreDB
+						eventStoreAdapter.createSnapshot(book);
+
 					} catch (Throwable e) {
 						log.error("發生錯誤，儲存 Event 失敗", e);
 					}
@@ -124,18 +119,14 @@ public class BookCommandService extends BaseApplicationService {
 	 * @return BookUpdatedData
 	 */
 	public BookUpdatedData update(UpdateBookCommand command) {
-
 		BookUpdatedData bookUpdatedData = bookService.update(command);
-
-		// 發布事件
-		this.publishBookEvent();
 		return bookUpdatedData;
 	}
 
 	/**
-	 * 發布 Book Event
+	 * 發布 Event 到 Topic
 	 */
-	private void publishBookEvent() {
+	private void publishBookEvent(String topic) {
 		BaseEvent event = ContextHolder.getEvent();
 		// 寫入 EventLog（當有 Next Event 需要發佈時）
 		EventLog eventLog = this.generateEventLog(topic, event);

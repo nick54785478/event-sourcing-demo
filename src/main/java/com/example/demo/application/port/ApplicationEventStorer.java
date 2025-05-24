@@ -2,8 +2,11 @@ package com.example.demo.application.port;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import com.example.demo.base.core.domain.BaseAggregateRoot;
+import com.example.demo.base.kernel.domain.event.BaseReadEventCommand;
+import com.example.demo.base.kernel.domain.event.BaseSnapshotResource;
 
 public interface ApplicationEventStorer<T extends BaseAggregateRoot> {
 
@@ -12,35 +15,36 @@ public interface ApplicationEventStorer<T extends BaseAggregateRoot> {
 	 * 
 	 * @param eventType     事件類型
 	 * @param aggregateRoot 聚合根的繼承類
-	 * @param map           被變更的資料
-	 * @throws Throwable
+	 * @param updatedMap    被變更的資料
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 */
-	void appendEvent(String eventType, T aggregateRoot, Map<String, Object> updatedMap) throws Throwable;
-
-	/**
-	 * 從指定事件流中讀取事件
-	 * 
-	 * @param streamId
-	 * @return List<ResolvedEvent> 事件列表
-	 * @throws Throwable
-	 */
-	List<?> readEvents(String streamId) throws Throwable;
+	void appendEvent(String eventType, T aggregateRoot, Map<String, Object> updatedMap)
+			throws InterruptedException, ExecutionException;
 
 	/**
 	 * 從指定版本事件流中往後讀取事件
 	 * 
-	 * @param streamId 通常為 Prefix(Entity 名) + Aggregate 的唯一鍵值
-	 * @param index    版本，為 version - 1
+	 * @param resource
 	 * @return List<?> 事件列表
 	 * @throws Throwable
 	 */
-	List<?> readEvents(String streamId, Integer index) throws Throwable;
+	List<?> readEvents(BaseReadEventCommand command) throws Throwable;
 
 	/**
-	 * 建立 SnapShot(快照)
+	 * 建立快照
 	 * 
-	 * @param aggregateRoot    Aggregate Root 的繼承類
-	 * @param snapshotStreamId Snapshot Stream Id
+	 * @param aggregateRoot 聚合根的繼承類
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 */
-	void createSnapshot(T aggregateRoot, String snapshotStreamId) throws Throwable;
+	void createSnapshot(T aggregateRoot) throws InterruptedException, ExecutionException;
+
+	/**
+	 * 讀取快照
+	 * 
+	 * @param command 用來查詢快照 (封裝 Stream Id 、 Index)
+	 */
+	BaseSnapshotResource readSnapshot(BaseReadEventCommand command);
+
 }

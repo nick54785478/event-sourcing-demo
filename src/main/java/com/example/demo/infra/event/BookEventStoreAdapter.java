@@ -17,6 +17,8 @@ import com.eventstore.dbclient.ReadStreamOptions;
 import com.eventstore.dbclient.ResolvedEvent;
 import com.eventstore.dbclient.StreamNotFoundException;
 import com.example.demo.application.port.ApplicationEventStorer;
+import com.example.demo.base.kernel.domain.event.BaseReadEventCommand;
+import com.example.demo.base.kernel.domain.event.BaseSnapshotResource;
 import com.example.demo.domain.book.aggregate.Book;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +36,12 @@ public class BookEventStoreAdapter implements ApplicationEventStorer<Book> {
 	 * @param eventType  事件類型
 	 * @param root       Aggregate 根實體
 	 * @param updatedMap 被變更的資料(欄位, 更改後的值)
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 */
 	@Override
-	public void appendEvent(String eventType, Book aggregateRoot, Map<String, Object> updatedMap) throws Throwable {
+	public void appendEvent(String eventType, Book aggregateRoot, Map<String, Object> updatedMap)
+			throws InterruptedException, ExecutionException {
 		// 建立前綴 - Book
 		String prefix = aggregateRoot.getClass().getSimpleName();
 
@@ -45,28 +50,25 @@ public class BookEventStoreAdapter implements ApplicationEventStorer<Book> {
 
 		// 構建事件數據
 		EventData eventData = EventData.builderAsJson(eventType, updatedMap).eventId(UUID.randomUUID()).build();
-
 		// 存入 Event Store DB (key, data)
 		eventStoreDBClient.appendToStream(eventStreamId, eventData).get();
-
 	}
 
 	/**
-	 * 建立 SnapShot(快照)
+	 * 建立快照
 	 * 
-	 * @param book
-	 * @param snapshotStreamId
+	 * @param aggregateRoot
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 */
 	@Override
-	public void createSnapshot(Book book, String snapshotStreamId) throws Throwable {
-		// 建立前綴 - Book
-		String prefix = book.getClass().getSimpleName();
-
-		// 儲存快照到 Event Store DB
-		EventData snapshotEventData = EventData.builderAsJson(prefix + "-snapshot", book)
-				.eventId(UUID.randomUUID()).build();
-		// 寫入快照流
-		eventStoreDBClient.appendToStream(snapshotStreamId, snapshotEventData).get();
+	public void createSnapshot(Book aggregateRoot) throws InterruptedException, ExecutionException {
+		String prefix = aggregateRoot.getClass().getSimpleName();
+		String type = prefix + "-snapshot";
+		String eventStreamId = prefix + "-" + aggregateRoot.getUuid() + "-snapshot";
+		// 構建事件數據
+		EventData eventData = EventData.builderAsJson(type, aggregateRoot).eventId(UUID.randomUUID()).build();
+		eventStoreDBClient.appendToStream(eventStreamId, eventData).get();
 	}
 
 	/**
@@ -98,13 +100,13 @@ public class BookEventStoreAdapter implements ApplicationEventStorer<Book> {
 	}
 
 	@Override
-	public List<?> readEvents(String streamId) throws Throwable {
+	public List<?> readEvents(BaseReadEventCommand command) throws Throwable {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<?> readEvents(String streamId, Integer index) throws Throwable {
+	public BaseSnapshotResource readSnapshot(BaseReadEventCommand command) {
 		// TODO Auto-generated method stub
 		return null;
 	}

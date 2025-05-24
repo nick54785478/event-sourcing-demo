@@ -1,7 +1,5 @@
 package com.example.demo.iface.event;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -50,7 +48,7 @@ public class BookEventHandler extends BaseEventHandler {
 			// 查詢 EventLog
 			EventLog eventLog = eventLogRepository.findByUuid(event.getEventLogUuid());
 
-			// 防腐處理
+			// 防腐處理 => 建立 Command
 			ReleaseBookCommand command = ReleaseBookCommand.builder().bookId(eventData.getBookId()).couponNo("")
 					.eventType(eventLog.getClassName()).build();
 

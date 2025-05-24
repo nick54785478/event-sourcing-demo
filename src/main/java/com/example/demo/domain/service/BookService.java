@@ -11,10 +11,12 @@ import com.example.demo.domain.book.aggregate.Book;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.RenameBookCommand;
 import com.example.demo.domain.book.command.ReplayBookCommand;
+import com.example.demo.domain.book.command.ReprintBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.domain.share.BookCreatedData;
 import com.example.demo.domain.share.BookQueriedData;
 import com.example.demo.domain.share.BookRenamedData;
+import com.example.demo.domain.share.BookReprintedData;
 import com.example.demo.domain.share.BookUpdatedData;
 import com.example.demo.infra.event.BookEventStoreAdapter;
 import com.example.demo.infra.repository.BookRepository;
@@ -28,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BookService extends BaseDomainService {
 
 	private BookRepository bookRepository;
-	private BookEventStoreAdapter bookEventAdapter;
+	private BookEventStoreAdapter bookEventStoreAdapter;
 
 	/**
 	 * 新增書籍資料
@@ -44,6 +46,24 @@ public class BookService extends BaseDomainService {
 		return this.transformEntityToData(saved, BookCreatedData.class);
 	}
 
+	/**
+	 * 更版書籍資料
+	 * 
+	 * @param command
+	 * @return BookUpdatedData
+	 */
+	public BookReprintedData reprint(ReprintBookCommand command) {
+		Optional<Book> opt = bookRepository.findById(command.getBookId());
+		if (!opt.isPresent()) {
+			throw new ValidationException("VALIDATE_FAILED", String.format("book not found (%s)", command.getBookId()));
+		} else {
+			// 叫用 Command Handler
+			Book book = opt.get();
+			book.reprint(command);
+			Book saved = bookRepository.save(book);
+			return this.transformEntityToData(saved, BookReprintedData.class);
+		}
+	}
 
 	/**
 	 * 更新書籍資料
