@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.application.port.ApplicationEventPublisher;
 import com.example.demo.base.core.infra.EventLogRepository;
 import com.example.demo.base.kernel.domain.EventLog;
 import com.example.demo.base.kernel.domain.enums.EventLogSendQueueStatus;
 import com.example.demo.base.kernel.domain.event.BasePublishEvent;
-import com.example.demo.infra.event.KafkaPublishAdapter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +23,7 @@ public class EventRePublishSchedule {
 	@Autowired
 	private EventLogRepository eventLogRepository;
 	@Autowired
-	private KafkaPublishAdapter kafkaEventPublisher;
+	private ApplicationEventPublisher kafkaEventPublisher;
 
 	@Value("${kafka.book.topic.name}")
 	private String topic;
