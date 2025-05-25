@@ -1,6 +1,4 @@
-package com.example.demo.domain.book.command;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+package com.example.demo.domain.share;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,8 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ApplyBookCommand {
+public class BookReplayedData {
+
+	private String uuid; // PK uuid
+
+	private String u;
 
 	private String name; // 姓名
 
@@ -18,5 +19,5 @@ public class ApplyBookCommand {
 
 	private String isbn; // isbn
 
-	private Integer version; // version
+	private Integer version = 0;
 }

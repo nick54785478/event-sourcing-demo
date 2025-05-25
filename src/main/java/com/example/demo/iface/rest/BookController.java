@@ -56,7 +56,12 @@ public class BookController extends BaseController {
 				HttpStatus.CREATED);
 	}
 	
-	@PostMapping("/{bookId}/reprint")
+	/**
+	 * Reprint Book
+	 * 
+	 * @param resource
+	 * */
+	@PostMapping("/reprint/{bookId}")
 	public ResponseEntity<BookReprintedResource> reprint(@PathVariable String bookId,
 			@Valid @RequestBody ReprintBookResource resource) {
 		// DTO 防腐處理 (Resource > Command)
@@ -101,11 +106,12 @@ public class BookController extends BaseController {
 	 */
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BookQueriedResource> query(@PathVariable String bookId) {
-
 		return new ResponseEntity<>(
 				BaseDataTransformer.transformData(bookQueryService.queryById(bookId), BookQueriedResource.class),
 				HttpStatus.OK);
 	}
+	
+	@GetMapping("/snapshot/")
 
 	/**
 	 * Replay book
@@ -118,7 +124,7 @@ public class BookController extends BaseController {
 	public ResponseEntity<BookReplayedResource> replay(@PathVariable String bookId) {
 
 		// 呼叫 Application Service
-//		bookCommandService.replay(bookId);
+		bookCommandService.replay(bookId);
 		return new ResponseEntity<>(new BookReplayedResource(bookId), HttpStatus.OK);
 	}
 

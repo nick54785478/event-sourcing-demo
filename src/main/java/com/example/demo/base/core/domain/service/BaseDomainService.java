@@ -1,6 +1,9 @@
 package com.example.demo.base.core.domain.service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +15,12 @@ import com.example.demo.base.kernel.domain.event.BaseEvent;
 import com.example.demo.base.kernel.util.BaseDataTransformer;
 import com.example.demo.base.kernel.util.ObjectMapperUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Base Domain Service
  */
+@Slf4j
 @Service
 public abstract class BaseDomainService {
 
@@ -62,5 +68,33 @@ public abstract class BaseDomainService {
 		EventLog eventLog = EventLog.builder().uuid(eventLogUuid).topic(topicQueue).targetId(targetId)
 				.className(event.getClass().getName()).body(ObjectMapperUtil.serialize(event)).userId("SYSTEM").build();
 		return eventLogRepository.save(eventLog);
+	}
+	
+	/**
+	 * 比對 先前資料 與 目標資料
+	 * 
+	 * @param source 先前資料
+	 * @param target 目標資料
+	 * @return Map<Entity欄位, 值>
+	 */
+	public Map<String, Object> compareAggregateRoot(Object source, Object target) {
+		Map<String, Object> differences = new LinkedHashMap<>();
+		try {
+			Map<String, Object> sourceMap = ObjectMapperUtil.convertToMap(source);
+			Map<String, Object> targetMap = ObjectMapperUtil.convertToMap(target);
+
+			for (String key : sourceMap.keySet()) {
+				if (targetMap.containsKey(key)) {
+					Object before = sourceMap.get(key);
+					Object after = targetMap.get(key);
+					if (!Objects.equals(before, after)) {
+						differences.put(key, after);
+					}
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			log.error("物件轉換比對失敗", e);
+		}
+		return differences;
 	}
 }

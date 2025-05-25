@@ -25,11 +25,11 @@ public abstract class BaseAggregateRoot {
 
 	@CreatedDate
 	@Column(name = "CREATED_DATE")
-	private Date createdDate; // 創建時間
+	protected Date createdDate; // 創建時間
 
 	@CreatedBy
 	@Column(name = "CREATED_BY")
-	private String createdBy; // 創建者
+	protected String createdBy; // 創建者
 
 	@LastModifiedDate
 	@Column(name = "LAST_UPDATED_DATE")

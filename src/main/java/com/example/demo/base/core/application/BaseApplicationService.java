@@ -83,32 +83,6 @@ public abstract class BaseApplicationService {
 		return eventLogRepository.save(eventLog);
 	}
 
-	/**
-	 * 比對 先前資料 與 目標資料
-	 * 
-	 * @param source 先前資料
-	 * @param target 目標資料
-	 * @return Map<Entity欄位, 值>
-	 */
-	protected Map<String, Object> compareAggregateRoot(Object source, Object target) {
-		Map<String, Object> differences = new LinkedHashMap<>();
-		try {
-			Map<String, Object> sourceMap = ObjectMapperUtil.convertToMap(source);
-			Map<String, Object> targetMap = ObjectMapperUtil.convertToMap(target);
 
-			for (String key : sourceMap.keySet()) {
-				if (targetMap.containsKey(key)) {
-					Object before = sourceMap.get(key);
-					Object after = targetMap.get(key);
-					if (!Objects.equals(before, after)) {
-						differences.put(key, after);
-					}
-				}
-			}
-		} catch (IllegalArgumentException e) {
-			log.error("物件轉換比對失敗", e);
-		}
-		return differences;
-	}
 
 }

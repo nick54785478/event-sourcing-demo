@@ -1,5 +1,7 @@
 package com.example.demo.domain.book.command;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +20,9 @@ public class ReprintBookCommand {
 	private String author;
 	
 	private String isbn;
+	
+	private String createdBy;
+	
+	private Date createdDate;
 
 }

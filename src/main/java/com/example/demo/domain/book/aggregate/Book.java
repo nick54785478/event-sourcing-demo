@@ -1,5 +1,6 @@
 package com.example.demo.domain.book.aggregate;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -7,9 +8,9 @@ import java.util.UUID;
 import com.example.demo.base.core.domain.BaseAggregateRoot;
 import com.example.demo.base.kernel.config.context.ContextHolder;
 import com.example.demo.base.kernel.domain.event.BaseEvent;
-import com.example.demo.domain.book.command.ApplyBookCommand;
 import com.example.demo.domain.book.command.CreateBookCommand;
-import com.example.demo.domain.book.command.ReplayBookCommand;
+import com.example.demo.domain.book.command.ReplayBookCommand.ReplayBookEventCommand;
+import com.example.demo.domain.book.command.ReplayBookCommand.ReplayBookSnapshotCommand;
 import com.example.demo.domain.book.command.ReprintBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.domain.book.outbound.BookCreatedEvent;
@@ -24,6 +25,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,6 +37,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "BOOK")
+@EqualsAndHashCode(callSuper = true)
 public class Book extends BaseAggregateRoot {
 
 	@Id
@@ -116,33 +119,30 @@ public class Book extends BaseAggregateRoot {
 	}
 
 	/**
+	 * 資料復原(從快照進行資料回復)
+	 * 
+	 * @param command
+	 */
+	public void recover(ReplayBookSnapshotCommand command) {
+		this.uuid = command.getUuid(); // PK uuid
+		this.name = command.getName(); // 姓名
+		this.author = command.getAuthor(); // 作者
+		this.isbn = command.getIsbn(); // isbn
+		this.version = command.getVersion();
+	}
+
+	/**
 	 * 將 Events 更新到 Book 中
 	 * 
-	 * @param applyCommands
+	 * @param commands
 	 */
-	public void apply(List<ApplyBookCommand> applyCommands) {
-		applyCommands.stream().forEach(command -> {
+	public void apply(List<ReplayBookEventCommand> commands) {
+		commands.stream().forEach(command -> {
 			this.name = Objects.isNull(command.getName()) ? this.name : command.getName();
 			this.author = Objects.isNull(command.getAuthor()) ? this.author : command.getAuthor();
 			this.isbn = Objects.isNull(command.getIsbn()) ? this.isbn : command.getIsbn();
 			this.version = command.getVersion();
 		});
-	}
-
-	/**
-	 * replay EventSourcing
-	 * 
-	 * @param command
-	 */
-	public void replay(ReplayBookCommand command) {
-		this.uuid = command.getUuid();
-		this.u = command.getU();
-		this.name = command.getName();
-		this.author = command.getAuthor();
-		this.isbn = command.getIsbn();
-		this.version = command.getVersion();
-		this.setCreatedDate(command.getCreatedDate());
-		this.setCreatedBy(command.getCreatedBy());
 	}
 
 }

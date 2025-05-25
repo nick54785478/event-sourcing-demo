@@ -22,15 +22,19 @@ import com.example.demo.base.kernel.domain.EventLog;
 import com.example.demo.base.kernel.domain.event.BaseEvent;
 import com.example.demo.base.kernel.domain.event.BaseReadEventCommand;
 import com.example.demo.base.kernel.domain.event.BaseSnapshotResource;
+import com.example.demo.base.kernel.exception.ValidationException;
 import com.example.demo.base.kernel.util.ObjectMapperUtil;
 import com.example.demo.domain.book.aggregate.Book;
-import com.example.demo.domain.book.command.ApplyBookCommand;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.ReleaseBookCommand;
+import com.example.demo.domain.book.command.ReplayBookCommand;
+import com.example.demo.domain.book.command.ReplayBookCommand.ReplayBookEventCommand;
+import com.example.demo.domain.book.command.ReplayBookCommand.ReplayBookSnapshotCommand;
 import com.example.demo.domain.book.command.ReprintBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.domain.service.BookService;
 import com.example.demo.domain.share.BookCreatedData;
+import com.example.demo.domain.share.BookReplayedData;
 import com.example.demo.domain.share.BookReprintedData;
 import com.example.demo.domain.share.BookUpdatedData;
 import com.example.demo.infra.repository.BookRepository;
@@ -67,7 +71,7 @@ public class BookCommandService extends BaseApplicationService {
 	}
 
 	/**
-	 * 更版 Book
+	 * 更版 Book 資料
 	 * 
 	 * @param command
 	 * @return BookReprintedData
@@ -81,12 +85,11 @@ public class BookCommandService extends BaseApplicationService {
 	}
 
 	/**
-	 * 儲存 EventSourcing
+	 * 釋放舊版本，儲存領域事件資料
 	 * 
 	 * @param command
 	 */
 	public void release(ReleaseBookCommand command) {
-
 		try {
 			// 取得 clazz
 			Class<?> clazz = Class.forName(command.getEventType());
@@ -97,15 +100,13 @@ public class BookCommandService extends BaseApplicationService {
 				// 處理更版事件
 				this.processReprintEvent(command, clazz.getSimpleName());
 			}
-
 		} catch (ClassNotFoundException e) {
 			log.error("物件未發現，轉換錯誤", e);
 		}
-
 	}
 
 	/**
-	 * Service Command method to update
+	 * 更新書本資料，非更版，故沒有更新版本號
 	 * 
 	 * @param command
 	 * @return BookUpdatedData
@@ -126,9 +127,8 @@ public class BookCommandService extends BaseApplicationService {
 		this.publishEvent(topic, event, eventLog);
 	}
 
-
 	/**
-	 * 處理更版事件
+	 * 處理新增事件
 	 * 
 	 * @param command
 	 * @param aggregateName
@@ -170,27 +170,29 @@ public class BookCommandService extends BaseApplicationService {
 			try {
 				// 讀取快取
 				BaseReadEventCommand readCommand = BaseReadEventCommand.builder().streamId(aggregateId).build();
-
 				BaseSnapshotResource snapshotResource = eventStoreAdapter.readSnapshot(readCommand);
+
+				// ReplayBookCommand
 				// 轉換快取資料
 				if (!Objects.isNull(snapshotResource)) {
-					Book bookSnapshot = ObjectMapperUtil.unserialize(snapshotResource.getEventData(), Book.class);
+					ReplayBookSnapshotCommand bookSnapshot = ObjectMapperUtil
+							.unserialize(snapshotResource.getEventData(), ReplayBookSnapshotCommand.class);
 					List<BaseSnapshotResource> events = (List<BaseSnapshotResource>) eventStoreAdapter
 							.readEvents(readCommand);
-
-					// DTO -> Command
 					// 重現上一版資料
-					List<ApplyBookCommand> applyBookCommands = events.stream().map(event -> {
-						return ObjectMapperUtil.unserialize(event.getEventData(), ApplyBookCommand.class);
-					}).sorted(Comparator.comparing(ApplyBookCommand::getVersion)).collect(Collectors.toList());
-					bookSnapshot.apply(applyBookCommands);
+					List<ReplayBookEventCommand> replayBookEventCommands = events.stream().map(event -> {
+						return ObjectMapperUtil.unserialize(event.getEventData(), ReplayBookEventCommand.class);
+					}).sorted(Comparator.comparing(ReplayBookEventCommand::getVersion)).collect(Collectors.toList());
+
+					// 轉換為 Replay Book Command
+					ReplayBookCommand replayCommand = ReplayBookCommand.builder().snapshot(bookSnapshot)
+							.events(replayBookEventCommands).build();
+					BookReplayedData recoveredBook = bookService.replay(replayCommand);
 
 					// 比對兩者 => 建立 UpdatedMap
-					Map<String, Object> updatedMap = compareAggregateRoot(bookSnapshot, book);
-
+					Map<String, Object> updatedMap = bookService.compareAggregateRoot(recoveredBook, book);
 					// EventStoreDB 儲存資料
 					eventStoreAdapter.appendEvent(aggregateName, book, updatedMap);
-
 				}
 
 			} catch (StreamNotFoundException e) {
@@ -205,6 +207,47 @@ public class BookCommandService extends BaseApplicationService {
 			}
 
 		});
+
+	}
+
+	/**
+	 * 重播 Book 資料
+	 * 
+	 * @param command
+	 */
+	public void replay(String bookUuid) {
+
+		BaseReadEventCommand readEventCommand = BaseReadEventCommand.builder()
+				.streamId(Book.class.getSimpleName() + "-" + bookUuid).build();
+
+		try {
+			// 取出最新的快取
+			BaseSnapshotResource snapshotResource = eventStoreAdapter.readSnapshot(readEventCommand);
+
+			if (Objects.isNull(snapshotResource)) {
+				log.error("查無快照， Snapshot 快照資料已遺失。");
+				throw new ValidationException("VALIDATION_EXCEPTION", "查無快取，EventDB 資料已遺失。");
+			}
+
+			ReplayBookSnapshotCommand bookSnapshot = ObjectMapperUtil.unserialize(snapshotResource.getEventData(),
+					ReplayBookSnapshotCommand.class);
+			List<BaseSnapshotResource> events = (List<BaseSnapshotResource>) eventStoreAdapter
+					.readEvents(readEventCommand);
+			// 重現上一版資料
+			List<ReplayBookEventCommand> replayBookEventCommands = events.stream().map(event -> {
+				return ObjectMapperUtil.unserialize(event.getEventData(), ReplayBookEventCommand.class);
+			}).sorted(Comparator.comparing(ReplayBookEventCommand::getVersion)).collect(Collectors.toList());
+
+			// 轉換為 Replay Book Command
+			ReplayBookCommand replayCommand = ReplayBookCommand.builder().snapshot(bookSnapshot)
+					.events(replayBookEventCommands).build();
+
+			// 重播後復原 Book 資料
+			bookService.replayAndRecover(replayCommand);
+
+		} catch (InterruptedException | ExecutionException e) {
+			log.error("發生錯誤，復原失敗");
+		}
 
 	}
 
