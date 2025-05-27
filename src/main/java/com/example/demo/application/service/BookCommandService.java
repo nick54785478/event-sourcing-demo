@@ -33,10 +33,9 @@ import com.example.demo.domain.book.command.ReplayBookCommand.ReplayBookSnapshot
 import com.example.demo.domain.book.command.ReprintBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
 import com.example.demo.domain.service.BookService;
-import com.example.demo.domain.share.BookCreatedData;
-import com.example.demo.domain.share.BookReplayedData;
-import com.example.demo.domain.share.BookReprintedData;
-import com.example.demo.domain.share.BookUpdatedData;
+import com.example.demo.iface.dto.BookCreatedResource;
+import com.example.demo.iface.dto.BookReprintedResource;
+import com.example.demo.iface.dto.BookUpdatedResource;
 import com.example.demo.infra.repository.BookRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -59,29 +58,48 @@ public class BookCommandService extends BaseApplicationService {
 	 * 新增 Book 資料
 	 * 
 	 * @param command
-	 * @return BookCreatedData
+	 * @return BookCreatedResource
 	 * @throws ValidationFailedException
 	 */
-	public BookCreatedData create(CreateBookCommand command) {
+	public BookCreatedResource create(CreateBookCommand command) {
+
 		// 新增 Book 資料
-		BookCreatedData bookCreatedData = bookService.create(command);
+		Book book = new Book();
+		book.create(command);
+		Book saved = bookRepository.save(book);
+
+		// 取得 Domain Event
+		BaseEvent event = ContextHolder.getEvent();
+
 		// 發布事件 進行 EventSourcing
-		this.publishBookEvent(bookTopic);
-		return bookCreatedData;
+		this.publishBookEvent(bookTopic, event);
+
+		return new BookCreatedResource(saved.getUuid());
 	}
 
 	/**
 	 * 更版 Book 資料
 	 * 
 	 * @param command
-	 * @return BookReprintedData
+	 * @return BookReprintedResource
 	 */
-	public BookReprintedData reprint(ReprintBookCommand command) {
+	public BookReprintedResource reprint(ReprintBookCommand command) {
+
+		Book book = bookRepository.findById(command.getBookId()).orElseThrow(() -> {
+			log.error(String.format("book not found (%s)", command.getBookId()));
+			throw new ValidationException("VALIDATE_FAILED", String.format("book not found (%s)", command.getBookId()));
+		});
+
 		// 執行更版動作
-		BookReprintedData bookReprintedData = bookService.reprint(command);
+		book.reprint(command);
+		Book saved = bookRepository.save(book);
+
+		// 取得 Domain Event
+		BaseEvent event = ContextHolder.getEvent();
+
 		// 發布事件
-		this.publishBookEvent(bookTopic);
-		return bookReprintedData;
+		this.publishBookEvent(bookTopic, event);
+		return new BookReprintedResource(saved.getUuid());
 	}
 
 	/**
@@ -111,16 +129,22 @@ public class BookCommandService extends BaseApplicationService {
 	 * @param command
 	 * @return BookUpdatedData
 	 */
-	public BookUpdatedData update(UpdateBookCommand command) {
-		BookUpdatedData bookUpdatedData = bookService.update(command);
-		return bookUpdatedData;
+	public BookUpdatedResource update(UpdateBookCommand command) {
+		Book book = bookRepository.findById(command.getBookId()).orElseThrow(() -> {
+			log.error(String.format("book not found (%s)", command.getBookId()));
+			throw new ValidationException("VALIDATE_FAILED", String.format("book not found (%s)", command.getBookId()));
+		});
+		book.update(command);
+		Book saved = bookRepository.save(book);
+		return new BookUpdatedResource(saved.getUuid());
 	}
 
 	/**
 	 * 發布 Event 到 Topic
+	 * 
+	 * @param topic
 	 */
-	private void publishBookEvent(String topic) {
-		BaseEvent event = ContextHolder.getEvent();
+	private void publishBookEvent(String topic, BaseEvent event) {
 		// 寫入 EventLog（當有 Next Event 需要發佈時）
 		EventLog eventLog = this.generateEventLog(topic, event);
 		// 發布事件
@@ -172,25 +196,30 @@ public class BookCommandService extends BaseApplicationService {
 				BaseReadEventCommand readCommand = BaseReadEventCommand.builder().streamId(aggregateId).build();
 				BaseSnapshotResource snapshotResource = eventStoreAdapter.readSnapshot(readCommand);
 
-				// ReplayBookCommand
 				// 轉換快取資料
 				if (!Objects.isNull(snapshotResource)) {
+
 					ReplayBookSnapshotCommand bookSnapshot = ObjectMapperUtil
 							.unserialize(snapshotResource.getEventData(), ReplayBookSnapshotCommand.class);
+
+					// 領域事件資料
 					List<BaseSnapshotResource> events = (List<BaseSnapshotResource>) eventStoreAdapter
 							.readEvents(readCommand);
+
 					// 重現上一版資料
 					List<ReplayBookEventCommand> replayBookEventCommands = events.stream().map(event -> {
 						return ObjectMapperUtil.unserialize(event.getEventData(), ReplayBookEventCommand.class);
 					}).sorted(Comparator.comparing(ReplayBookEventCommand::getVersion)).collect(Collectors.toList());
 
-					// 轉換為 Replay Book Command
-					ReplayBookCommand replayCommand = ReplayBookCommand.builder().snapshot(bookSnapshot)
+					ReplayBookCommand replayBookCommand = ReplayBookCommand.builder().snapshot(bookSnapshot)
 							.events(replayBookEventCommands).build();
-					BookReplayedData recoveredBook = bookService.replay(replayCommand);
 
-					// 比對兩者 => 建立 UpdatedMap
+					// 重播快照，以重現上一版資料
+					Book recoveredBook = this.replay(replayBookCommand);
+
+					// 呼叫 Domain Service 進行 AggregateRoot 比對 --> 建立 UpdatedMap
 					Map<String, Object> updatedMap = bookService.compareAggregateRoot(recoveredBook, book);
+
 					// EventStoreDB 儲存資料
 					eventStoreAdapter.appendEvent(aggregateName, book, updatedMap);
 				}
@@ -205,9 +234,22 @@ public class BookCommandService extends BaseApplicationService {
 			} catch (ExecutionException e) {
 				log.error("讀取快照時發生非同步執行錯誤", e);
 			}
-
 		});
+	}
 
+	/**
+	 * 重播快照，以重現上一版資料
+	 * 
+	 * @param command
+	 */
+	private Book replay(ReplayBookCommand command) {
+		// 從快照回復資料
+		Book book = new Book();
+		// 重現快照
+		book.recover(command.getSnapshot());
+		// 重播
+		book.apply(command.getEvents());
+		return book;
 	}
 
 	/**
@@ -239,11 +281,12 @@ public class BookCommandService extends BaseApplicationService {
 			}).sorted(Comparator.comparing(ReplayBookEventCommand::getVersion)).collect(Collectors.toList());
 
 			// 轉換為 Replay Book Command
-			ReplayBookCommand replayCommand = ReplayBookCommand.builder().snapshot(bookSnapshot)
+			ReplayBookCommand command = ReplayBookCommand.builder().snapshot(bookSnapshot)
 					.events(replayBookEventCommands).build();
 
 			// 重播後復原 Book 資料
-			bookService.replayAndRecover(replayCommand);
+			Book book = replay(command);
+			bookRepository.save(book);
 
 		} catch (InterruptedException | ExecutionException e) {
 			log.error("發生錯誤，復原失敗");

@@ -13,8 +13,11 @@ public class BookQueriedResource {
 
 	@JsonProperty("bookId")
 	private String uuid;
+	
 	private String name;
+	
 	private String author;
+	
 	private String isbn;
 
 }

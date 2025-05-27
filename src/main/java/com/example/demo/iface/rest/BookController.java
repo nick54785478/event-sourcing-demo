@@ -17,9 +17,6 @@ import com.example.demo.base.kernel.util.BaseDataTransformer;
 import com.example.demo.domain.book.command.CreateBookCommand;
 import com.example.demo.domain.book.command.ReprintBookCommand;
 import com.example.demo.domain.book.command.UpdateBookCommand;
-import com.example.demo.domain.share.BookCreatedData;
-import com.example.demo.domain.share.BookReprintedData;
-import com.example.demo.domain.share.BookUpdatedData;
 import com.example.demo.iface.dto.BookCreatedResource;
 import com.example.demo.iface.dto.BookQueriedResource;
 import com.example.demo.iface.dto.BookReplayedResource;
@@ -51,16 +48,15 @@ public class BookController extends BaseController {
 		// DTO 防腐處理 (resource > Command)
 		CreateBookCommand command = BaseDataTransformer.transformData(resource, CreateBookCommand.class);
 		// 呼叫 Application Service
-		BookCreatedData responseBody = bookCommandService.create(command);
-		return new ResponseEntity<>(BaseDataTransformer.transformData(responseBody, BookCreatedResource.class),
-				HttpStatus.CREATED);
+		BookCreatedResource responseBody = bookCommandService.create(command);
+		return new ResponseEntity<>(responseBody, HttpStatus.CREATED);
 	}
-	
+
 	/**
 	 * Reprint Book
 	 * 
 	 * @param resource
-	 * */
+	 */
 	@PostMapping("/reprint/{bookId}")
 	public ResponseEntity<BookReprintedResource> reprint(@PathVariable String bookId,
 			@Valid @RequestBody ReprintBookResource resource) {
@@ -69,11 +65,10 @@ public class BookController extends BaseController {
 		command.setBookId(bookId);
 
 		// 呼叫 Application Service
-		BookReprintedData responseBody = bookCommandService.reprint(command);
+		BookReprintedResource responseBody = bookCommandService.reprint(command);
 
 		// DTO 防腐處理 (Domain > DTO)，並回傳
-		return new ResponseEntity<>(BaseDataTransformer.transformData(responseBody, BookReprintedResource.class),
-				HttpStatus.OK);
+		return new ResponseEntity<>(responseBody, HttpStatus.OK);
 	}
 
 	/**
@@ -91,7 +86,7 @@ public class BookController extends BaseController {
 		command.setBookId(bookId);
 
 		// 呼叫 Application Service
-		BookUpdatedData responseBody = bookCommandService.update(command);
+		BookUpdatedResource responseBody = bookCommandService.update(command);
 
 		// DTO 防腐處理 (Domain > DTO)，並回傳
 		return new ResponseEntity<>(BaseDataTransformer.transformData(responseBody, BookUpdatedResource.class),
@@ -107,10 +102,10 @@ public class BookController extends BaseController {
 	@GetMapping("/{bookId}")
 	public ResponseEntity<BookQueriedResource> query(@PathVariable String bookId) {
 		return new ResponseEntity<>(
-				BaseDataTransformer.transformData(bookQueryService.queryById(bookId), BookQueriedResource.class),
+				BaseDataTransformer.transformData(bookQueryService.queryByBookId(bookId), BookQueriedResource.class),
 				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/snapshot/")
 
 	/**
